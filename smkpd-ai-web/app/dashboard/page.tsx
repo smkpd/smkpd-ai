@@ -36,11 +36,40 @@ const tools: Array<{
   { id: "surat", icon: "📄", title: "Generator Surat", subtitle: "Surat resmi sekolah" },
 ];
 
-const roleMenus: Record<Role, string[]> = {
-  Admin: ["Dashboard", "AI Assistant", "Perangkat Ajar", "Soal & Asesmen", "Surat Digital", "Pengguna"],
-  Guru: ["Dashboard", "AI Assistant", "Perangkat Ajar", "Soal & Asesmen", "Surat Digital"],
-  Taruna: ["Dashboard", "AI Assistant", "Maritime English", "Nautika", "Teknika"],
-  "Wali Taruna": ["Dashboard", "Pengumuman", "Informasi Akademik", "AI Assistant"],
+const roleMenus: Record<
+  Role,
+  Array<{ label: string; href: string; icon: string }>
+> = {
+  Admin: [
+    { label: "Dashboard", href: "/dashboard", icon: "▦" },
+    { label: "AI Profesional", href: "/ai", icon: "✦" },
+    { label: "Perangkat Ajar", href: "/dashboard#generator", icon: "📘" },
+    { label: "PDF & Knowledge", href: "/knowledge", icon: "📂" },
+    { label: "Dashboard Kepala", href: "/kepala-sekolah", icon: "📊" },
+    { label: "Mode Presentasi", href: "/presentasi", icon: "▶" },
+  ],
+  Guru: [
+    { label: "Dashboard", href: "/dashboard", icon: "▦" },
+    { label: "AI Profesional", href: "/ai", icon: "✦" },
+    { label: "Perangkat Ajar", href: "/dashboard#generator", icon: "📘" },
+    { label: "PDF & Knowledge", href: "/knowledge", icon: "📂" },
+    { label: "AI Nautika", href: "/ai?mode=nautika", icon: "⚓" },
+    { label: "Maritime English", href: "/ai?mode=english", icon: "📚" },
+  ],
+  Taruna: [
+    { label: "Dashboard", href: "/dashboard", icon: "▦" },
+    { label: "AI Assistant", href: "/ai", icon: "✦" },
+    { label: "Maritime English", href: "/ai?mode=english", icon: "📚" },
+    { label: "AI Nautika", href: "/ai?mode=nautika", icon: "⚓" },
+    { label: "AI Teknika", href: "/ai?mode=teknika", icon: "⚙️" },
+    { label: "Knowledge Base", href: "/knowledge", icon: "📂" },
+  ],
+  "Wali Taruna": [
+    { label: "Dashboard", href: "/dashboard", icon: "▦" },
+    { label: "AI Assistant", href: "/ai", icon: "✦" },
+    { label: "Informasi Dokumen", href: "/knowledge", icon: "📂" },
+    { label: "Mode Presentasi", href: "/presentasi", icon: "▶" },
+  ],
 };
 
 function safeFileName(value: string) {
@@ -634,7 +663,7 @@ export default function DashboardPage() {
       <aside className="dashboard-sidebar">
         <Link href="/" className="dash-brand">
           <img src="/logo-smkpd.png" alt="Logo SMKPD" />
-          <div><strong>SMKPD AI</strong><small>Official Logo v2.4.1</small></div>
+          <div><strong>SMKPD AI</strong><small>Presentation Edition v3.0</small></div>
         </Link>
 
         <div className="dash-user">
@@ -644,9 +673,13 @@ export default function DashboardPage() {
 
         <nav className="dash-menu">
           {roleMenus[session.role].map((item, index) => (
-            <button className={index === 0 ? "active" : ""} key={item}>
-              <span>{["▦", "✦", "📘", "📝", "📄", "👥"][index] || "•"}</span>{item}
-            </button>
+            <Link
+              className={index === 0 ? "active" : ""}
+              key={`${item.label}-${item.href}`}
+              href={item.href}
+            >
+              <span>{item.icon}</span>{item.label}
+            </Link>
           ))}
         </nav>
 
@@ -660,7 +693,7 @@ export default function DashboardPage() {
             <h1>Dashboard SMKPD AI</h1>
           </div>
           <div className="topbar-actions">
-            <Link href="/" className="outline-action">AI Assistant</Link>
+            <Link href="/ai" className="outline-action">AI Profesional</Link>
             <button className="notification-button">🔔</button>
           </div>
         </header>
@@ -684,7 +717,7 @@ export default function DashboardPage() {
           <article><span>●</span><div><strong>Online</strong><small>Status Gemini AI</small></div></article>
         </section>
 
-        <section className="dashboard-tools">
+        <section className="dashboard-tools" id="generator">
           <div className="dashboard-section-title">
             <div><p>GENERATOR PROFESIONAL</p><h2>Pilih dokumen yang akan dibuat</h2></div>
             <span>Powered by Gemini AI</span>
@@ -874,7 +907,7 @@ export default function DashboardPage() {
         </section>
 
         <footer className="dashboard-footer">
-          <span>SMKPD AI Official Logo v2.4.1</span>
+          <span>SMKPD AI Presentation Edition v3.0</span>
           <span>SMK Pelayaran Demak Boarding School • 2026</span>
         </footer>
       </section>

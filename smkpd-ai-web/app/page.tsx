@@ -114,7 +114,7 @@ export default function Home() {
         </div>
 
         <div className="nav-actions">
-          <Link className="dashboard-link" href="/login">Masuk Dashboard</Link>
+          <Link className="dashboard-link" href="/login">Masuk Portal v3</Link>
           <select aria-label="Peran pengguna" value={role} onChange={(e) => setRole(e.target.value)}>
             <option>Admin</option>
             <option>Guru</option>
@@ -139,11 +139,11 @@ export default function Home() {
           </p>
           <div className="hero-buttons">
             <a href="#assistant" className="primary-btn">Mulai Gunakan AI</a>
-            <Link href="/login" className="secondary-btn">Dashboard Guru</Link>
+            <Link href="/presentasi" className="secondary-btn">Lihat Semua Fitur</Link>
             <span className="status"><i /> Sistem demo aktif</span>
           </div>
           <div className="stats">
-            <div><strong>6</strong><span>Layanan AI</span></div>
+            <div><strong>12+</strong><span>Layanan AI</span></div>
             <div><strong>4</strong><span>Peran pengguna</span></div>
             <div><strong>2</strong><span>Bahasa</span></div>
           </div>
@@ -177,7 +177,9 @@ export default function Home() {
                 document.getElementById("assistant")?.scrollIntoView({ behavior: "smooth" });
               }}
             >
-              <span className="feature-icon">{item.icon}</span>
+              <span className={`feature-icon ${item.icon.startsWith("/") ? "service-logo-icon" : ""}`}>
+                {item.icon.startsWith("/") ? <img src={item.icon} alt="" /> : item.icon}
+              </span>
               <strong>{item.title}</strong>
               <small>{item.subtitle}</small>
               <span className="feature-arrow">→</span>
@@ -190,7 +192,9 @@ export default function Home() {
         <aside className="assistant-sidebar">
           <p className="eyebrow">MODE AKTIF</p>
           <div className="active-mode">
-            <span>{active.icon}</span>
+            <span className={active.icon.startsWith("/") ? "service-logo-icon" : ""}>
+              {active.icon.startsWith("/") ? <img src={active.icon} alt="" /> : active.icon}
+            </span>
             <div>
               <strong>{active.title}</strong>
               <small>{active.subtitle}</small>
@@ -202,7 +206,7 @@ export default function Home() {
           </button>
           <div className="demo-note">
             <strong>Mode Demo</strong>
-            <p>Login empat peran sudah disimulasikan. Keamanan akun dan database dapat ditambahkan pada tahap berikutnya.</p>
+            <p>Portal v3 menyediakan generator, AI maritim, PDF Knowledge Base, voice, arsip, dan statistik kepala sekolah.</p>
           </div>
         </aside>
 
@@ -262,7 +266,7 @@ export default function Home() {
           <strong>SMKPD AI</strong>
           <p>SMK Pelayaran Demak Boarding School</p>
         </div>
-        <span>© 2026 • Professional Demo v2.0</span>
+        <span>© 2026 • Presentation Edition v3.0</span>
       </footer>
     </main>
   );

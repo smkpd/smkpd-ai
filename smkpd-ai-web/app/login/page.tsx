@@ -7,7 +7,7 @@ import Link from "next/link";
 type Role = "Admin" | "Guru" | "Taruna" | "Wali Taruna";
 
 const accounts: Record<Role, { username: string; password: string; name: string }> = {
-  Admin: { username: "admin", password: "smkpd2026", name: "Administrator SMKPD" },
+  Admin: { username: "admin", password: "smkpd2026", name: "Kepala Sekolah / Administrator" },
   Guru: { username: "guru", password: "guru2026", name: "Guru SMKPD" },
   Taruna: { username: "taruna", password: "taruna2026", name: "Taruna SMKPD" },
   "Wali Taruna": { username: "wali", password: "wali2026", name: "Wali Taruna" },
