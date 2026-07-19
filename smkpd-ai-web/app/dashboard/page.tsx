@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-type Role = "Admin" | "Guru" | "Taruna" | "Wali Taruna";
+type Role = "Admin" | "Kepala Sekolah" | "Guru" | "Taruna" | "Wali Taruna";
 type Session = { role: Role; name: string; loginAt: string };
 type ToolId = "modul" | "cp" | "atp" | "lkpd" | "soal" | "surat";
 
@@ -219,14 +219,29 @@ const roleMenus: Record<
 > = {
   Admin: [
     { label: "Dashboard", href: "/dashboard", icon: "▦" },
+    { label: "Manajemen Pengguna", href: "/users", icon: "👥" },
+    { label: "Maritime Learning", href: "/maritime", icon: "⚓" },
+    { label: "Akademik", href: "/academic", icon: "📖" },
+    { label: "Layanan Sekolah", href: "/services", icon: "🏫" },
     { label: "AI Profesional", href: "/ai", icon: "✦" },
     { label: "Generator", href: "/dashboard#generator", icon: "📘" },
     { label: "PDF & Knowledge", href: "/knowledge", icon: "📂" },
     { label: "Dashboard Kepala", href: "/kepala-sekolah", icon: "📊" },
     { label: "Mode Presentasi", href: "/presentasi", icon: "▶" },
   ],
+
+  "Kepala Sekolah": [
+    { label: "Dashboard Eksekutif", href: "/kepala-sekolah", icon: "📊" },
+    { label: "Manajemen Pengguna", href: "/users", icon: "👥" },
+    { label: "Maritime Learning", href: "/maritime", icon: "⚓" },
+    { label: "Akademik", href: "/academic", icon: "📖" },
+    { label: "Layanan Sekolah", href: "/services", icon: "🏫" },
+    { label: "Mode Presentasi", href: "/presentasi", icon: "▶" },
+  ],
   Guru: [
     { label: "Dashboard", href: "/dashboard", icon: "▦" },
+    { label: "Maritime Learning", href: "/maritime", icon: "⚓" },
+    { label: "Akademik", href: "/academic", icon: "📖" },
     { label: "AI Profesional", href: "/ai", icon: "✦" },
     { label: "Generator", href: "/dashboard#generator", icon: "📘" },
     { label: "PDF & Knowledge", href: "/knowledge", icon: "📂" },
@@ -235,6 +250,9 @@ const roleMenus: Record<
   ],
   Taruna: [
     { label: "Dashboard", href: "/dashboard", icon: "▦" },
+    { label: "Maritime Learning", href: "/maritime", icon: "⚓" },
+    { label: "Akademik", href: "/academic", icon: "📖" },
+    { label: "Layanan Sekolah", href: "/services", icon: "🏫" },
     { label: "AI Assistant", href: "/ai", icon: "✦" },
     { label: "Maritime English", href: "/ai?mode=english", icon: "📚" },
     { label: "AI Nautika", href: "/ai?mode=nautika", icon: "⚓" },
@@ -243,6 +261,8 @@ const roleMenus: Record<
   ],
   "Wali Taruna": [
     { label: "Dashboard", href: "/dashboard", icon: "▦" },
+    { label: "Akademik", href: "/academic", icon: "📖" },
+    { label: "Layanan Sekolah", href: "/services", icon: "🏫" },
     { label: "AI Assistant", href: "/ai", icon: "✦" },
     { label: "Informasi Dokumen", href: "/knowledge", icon: "📂" },
     { label: "Mode Presentasi", href: "/presentasi", icon: "▶" },
@@ -919,14 +939,18 @@ export default function DashboardPage() {
   }
 
   const roleTitle =
-    session.role === "Taruna"
+    session.role === "Kepala Sekolah"
+      ? "Monitoring dan Pengendalian Sekolah"
+      : session.role === "Taruna"
       ? "Pusat Belajar Taruna"
       : session.role === "Wali Taruna"
         ? "Portal Informasi Wali Taruna"
         : "Administrasi dan pembelajaran selesai lebih cepat.";
 
   const roleDescription =
-    session.role === "Taruna"
+    session.role === "Kepala Sekolah"
+      ? "Akses dashboard eksekutif, manajemen pengguna, akademik, dan seluruh layanan strategis sekolah."
+      : session.role === "Taruna"
       ? "Gunakan AI Nautika, AI Teknika, Maritime English, dan Knowledge Base untuk mendukung pembelajaran."
       : session.role === "Wali Taruna"
         ? "Akses AI Assistant dan dokumen informasi sekolah yang tersedia pada perangkat ini."
@@ -962,7 +986,9 @@ export default function DashboardPage() {
                 ? "👨‍🎓"
                 : session.role === "Admin"
                   ? "👨‍💼"
-                  : "👨‍👩‍👦"}
+                  : session.role === "Kepala Sekolah"
+                    ? "👩‍💼"
+                    : "👨‍👩‍👦"}
           </span>
           <div>
             <strong>{session.name}</strong>
@@ -1744,7 +1770,7 @@ export default function DashboardPage() {
         )}
 
         <footer className="dashboard-footer">
-          <span>SMKPD AI Mobile & Functional Edition v3.1</span>
+          <span>SMKPD AI School Super App v4.0</span>
           <span>SMK Pelayaran Demak Boarding School • 2026</span>
         </footer>
       </section>

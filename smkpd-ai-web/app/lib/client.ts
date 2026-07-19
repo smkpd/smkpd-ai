@@ -1,4 +1,4 @@
-export type Role = "Admin" | "Guru" | "Taruna" | "Wali Taruna";
+export type Role = "Admin" | "Kepala Sekolah" | "Guru" | "Taruna" | "Wali Taruna";
 
 export type Session = {
   role: Role;

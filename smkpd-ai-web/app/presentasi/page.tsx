@@ -50,9 +50,11 @@ const sprints = [
     title: "Sprint 4 — AI Maritim",
     icon: "⚓",
     features: [
-      "AI Nautika",
-      "AI Teknika",
-      "Maritime English",
+      "AI Nautika dan AI Teknika",
+      "Maritime English dan SMCP",
+      "Virtual Ship Tour",
+      "Bridge & Engine Simulator Dasar",
+      "Bank Soal CBT AI",
       "Input suara",
       "Pembaca jawaban AI",
       "Knowledge context",
@@ -80,7 +82,7 @@ export default function PresentationPage() {
         <img src="/logo-smkpd-192.png" alt="Logo SMK Pelayaran Demak" />
         <div>
           <p className="suite-eyebrow">PRESENTATION READY</p>
-          <h2>SMKPD AI Professional Edition</h2>
+          <h2>SMKPD AI School Super App</h2>
           <p>
             Smart Maritime Education Platform untuk pembelajaran, administrasi,
             pengetahuan sekolah, monitoring, dan kecerdasan maritim.

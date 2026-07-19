@@ -4,50 +4,44 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import { loadSession, Role, Session } from "../lib/client";
+import { hasPermission, Permission } from "../lib/access";
 
 type Props = {
   title: string;
   subtitle: string;
   children: ReactNode;
   allowedRoles?: Role[];
+  requiredPermission?: Permission;
 };
 
-const navigation: Array<{
+type NavItem = {
   href: string;
   label: string;
   icon: string;
-  roles: Role[];
-}> = [
+  permission?: Permission;
+  roles?: Role[];
+};
+
+const navigation: NavItem[] = [
+  { href: "/dashboard", label: "Dashboard", icon: "▦" },
+  { href: "/ai", label: "AI Profesional", icon: "✦" },
+  { href: "/maritime", label: "Maritime Learning", icon: "⚓" },
+  { href: "/academic", label: "Akademik", icon: "📖" },
+  { href: "/services", label: "Layanan Sekolah", icon: "🏫" },
+  { href: "/knowledge", label: "PDF & Knowledge", icon: "📂" },
   {
-    href: "/dashboard",
-    label: "Dashboard",
-    icon: "▦",
-    roles: ["Admin", "Guru", "Taruna", "Wali Taruna"],
-  },
-  {
-    href: "/ai",
-    label: "AI Profesional",
-    icon: "✦",
-    roles: ["Admin", "Guru", "Taruna", "Wali Taruna"],
-  },
-  {
-    href: "/knowledge",
-    label: "PDF & Knowledge",
-    icon: "📂",
-    roles: ["Admin", "Guru", "Taruna", "Wali Taruna"],
+    href: "/users",
+    label: "Manajemen Pengguna",
+    icon: "👥",
+    permission: "manage_users",
   },
   {
     href: "/kepala-sekolah",
-    label: "Dashboard Kepala",
+    label: "Dashboard Eksekutif",
     icon: "📊",
-    roles: ["Admin"],
+    permission: "executive_dashboard",
   },
-  {
-    href: "/presentasi",
-    label: "Mode Presentasi",
-    icon: "▶",
-    roles: ["Admin", "Guru", "Taruna", "Wali Taruna"],
-  },
+  { href: "/presentasi", label: "Mode Presentasi", icon: "▶" },
 ];
 
 export default function PortalLayout({
@@ -55,6 +49,7 @@ export default function PortalLayout({
   subtitle,
   children,
   allowedRoles,
+  requiredPermission,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -75,24 +70,34 @@ export default function PortalLayout({
       return;
     }
 
+    if (
+      requiredPermission &&
+      !hasPermission(activeSession.role, requiredPermission)
+    ) {
+      router.replace("/dashboard");
+      return;
+    }
+
     setSession(activeSession);
     setReady(true);
-  }, [allowedRoles, router]);
+  }, [allowedRoles, requiredPermission, router]);
 
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
+  useEffect(() => setMenuOpen(false), [pathname]);
 
-  const visibleNavigation = useMemo(
-    () =>
-      session
-        ? navigation.filter((item) => item.roles.includes(session.role))
-        : [],
-    [session]
-  );
+  const visibleNavigation = useMemo(() => {
+    if (!session) return [];
+    return navigation.filter((item) => {
+      if (item.roles && !item.roles.includes(session.role)) return false;
+      if (item.permission && !hasPermission(session.role, item.permission)) {
+        return false;
+      }
+      return true;
+    });
+  }, [session]);
 
   function logout() {
     localStorage.removeItem("smkpd_session");
+    localStorage.removeItem("smkpd_current_user_id");
     router.push("/login");
   }
 
@@ -116,14 +121,14 @@ export default function PortalLayout({
       <aside className={`suite-sidebar ${menuOpen ? "open" : ""}`}>
         <div className="suite-sidebar-mobile-head">
           <span>Menu Utama</span>
-          <button onClick={() => setMenuOpen(false)} aria-label="Tutup menu">×</button>
+          <button onClick={() => setMenuOpen(false)}>×</button>
         </div>
 
         <Link href="/" className="suite-brand">
-          <img src="/logo-smkpd-192.png" alt="Logo SMK Pelayaran Demak" />
+          <img src="/logo-smkpd-192.png" alt="Logo SMKPD" />
           <div>
             <strong>SMKPD AI</strong>
-            <span>Mobile Edition v3.1</span>
+            <span>School Super App v4.0</span>
           </div>
         </Link>
 
@@ -131,11 +136,13 @@ export default function PortalLayout({
           <span>
             {session.role === "Admin"
               ? "👨‍💼"
-              : session.role === "Guru"
-                ? "👨‍🏫"
-                : session.role === "Taruna"
-                  ? "👨‍🎓"
-                  : "👨‍👩‍👦"}
+              : session.role === "Kepala Sekolah"
+                ? "👩‍💼"
+                : session.role === "Guru"
+                  ? "👨‍🏫"
+                  : session.role === "Taruna"
+                    ? "👨‍🎓"
+                    : "👨‍👩‍👦"}
           </span>
           <div>
             <strong>{session.name}</strong>
@@ -151,8 +158,7 @@ export default function PortalLayout({
               className={pathname === item.href ? "active" : ""}
               onClick={() => setMenuOpen(false)}
             >
-              <span>{item.icon}</span>
-              {item.label}
+              <span>{item.icon}</span>{item.label}
             </Link>
           ))}
         </nav>
@@ -174,7 +180,6 @@ export default function PortalLayout({
           <button
             className="suite-menu-toggle"
             onClick={() => setMenuOpen(true)}
-            aria-label="Buka menu"
           >
             ☰
           </button>

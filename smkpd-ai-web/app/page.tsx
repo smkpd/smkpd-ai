@@ -155,7 +155,7 @@ export default function Home() {
             <span className="status"><i /> Sistem demo aktif</span>
           </div>
           <div className="stats">
-            <div><strong>12+</strong><span>Layanan AI</span></div>
+            <div><strong>20+</strong><span>Layanan AI</span></div>
             <div><strong>4</strong><span>Peran pengguna</span></div>
             <div><strong>2</strong><span>Bahasa</span></div>
           </div>
@@ -225,7 +225,7 @@ export default function Home() {
           </a>
           <div className="demo-note">
             <strong>Mode Demo</strong>
-            <p>Portal v3 menyediakan generator, AI maritim, PDF Knowledge Base, voice, arsip, dan statistik kepala sekolah.</p>
+            <p>School Super App menyediakan AI maritim, simulator dasar, CBT, E-Raport, Absensi, SPP, PRALA, MCU, Alumni, PPDB, dan monitoring sekolah.</p>
           </div>
         </aside>
 
@@ -291,7 +291,7 @@ export default function Home() {
           <strong>SMKPD AI</strong>
           <p>SMK Pelayaran Demak Boarding School</p>
         </div>
-        <span>© 2026 • Mobile Edition v3.1</span>
+        <span>© 2026 • School Super App v4.0</span>
       </footer>
     </main>
   );

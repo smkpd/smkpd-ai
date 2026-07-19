@@ -96,7 +96,7 @@ export default function PrincipalDashboard() {
     <PortalLayout
       title="Dashboard Kepala Sekolah"
       subtitle="Ringkasan penggunaan AI, dokumen, Knowledge Base, dan aktivitas layanan."
-      allowedRoles={["Admin"]}
+      allowedRoles={["Kepala Sekolah", "Admin"]}
     >
       <section className="principal-hero">
         <div>
