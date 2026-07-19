@@ -93,7 +93,9 @@ export default function KnowledgePage() {
     const databaseRows = await dbGetAll<any>("library");
     const databaseRecords = databaseRows
       .map(fromDatabaseRecord)
-      .filter(Boolean) as KnowledgeRecord[];
+      .filter(
+        (item): item is KnowledgeRecord => item !== null
+      );
 
     // Migrate records from the older localStorage archive once.
     const legacy = loadArray<KnowledgeRecord>("smkpd_knowledge");
@@ -118,8 +120,12 @@ export default function KnowledgePage() {
     const refreshedRows = await dbGetAll<any>("library");
     const refreshed = refreshedRows
       .map(fromDatabaseRecord)
-      .filter(Boolean)
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt)) as KnowledgeRecord[];
+      .filter(
+        (item): item is KnowledgeRecord => item !== null
+      )
+      .sort(
+        (a, b) => b.createdAt.localeCompare(a.createdAt)
+      );
 
     setRecords(refreshed);
     setSelectedId((current) =>
