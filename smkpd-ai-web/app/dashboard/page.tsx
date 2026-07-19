@@ -552,18 +552,24 @@ export default function DashboardPage() {
     printWindow.document.close();
   }
 
-  function openDocument(document: DocumentRecord) {
-    setTool(document.tool);
-    setMapel(document.mapel);
-    setKelas(document.kelas);
-    setSemester(document.semester);
-    setLanguage(document.language);
-    setOutputFormat(document.outputFormat);
-    setTopik(document.title);
-    setResult(document.content);
-    setSelectedDocumentId(document.id);
-    setNotice(`Dokumen "${document.title}" berhasil dibuka kembali.`);
-    window.scrollTo({ top: document.documentElement.scrollHeight * 0.45, behavior: "smooth" });
+  function openDocument(record: DocumentRecord) {
+    setTool(record.tool);
+    setMapel(record.mapel);
+    setKelas(record.kelas);
+    setSemester(record.semester);
+    setLanguage(record.language);
+    setOutputFormat(record.outputFormat);
+    setTopik(record.title);
+    setResult(record.content);
+    setSelectedDocumentId(record.id);
+    setNotice(`Dokumen "${record.title}" berhasil dibuka kembali.`);
+
+    window.requestAnimationFrame(() => {
+      window.scrollTo({
+        top: window.document.documentElement.scrollHeight * 0.45,
+        behavior: "smooth",
+      });
+    });
   }
 
   function deleteDocument(documentId: string) {
@@ -628,7 +634,7 @@ export default function DashboardPage() {
       <aside className="dashboard-sidebar">
         <Link href="/" className="dash-brand">
           <img src="/logo-smkpd.png" alt="Logo SMKPD" />
-          <div><strong>SMKPD AI</strong><small>Professional v2.3</small></div>
+          <div><strong>SMKPD AI</strong><small>Official Logo v2.4.1</small></div>
         </Link>
 
         <div className="dash-user">
@@ -783,7 +789,7 @@ export default function DashboardPage() {
                 />
               ) : (
                 <div>
-                  <span>⚓</span>
+                  <img className="result-empty-logo" src="/logo-smkpd-192.png" alt="Logo SMK Pelayaran Demak" />
                   <h3>Dokumen akan tampil di sini</h3>
                   <p>Lengkapi formulir lalu klik tombol generator.</p>
                 </div>
@@ -860,7 +866,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="archive-empty">
-              <span>🗂️</span>
+              <img className="archive-empty-logo" src="/logo-smkpd-192.png" alt="Logo SMK Pelayaran Demak" />
               <h3>Belum ada dokumen pada arsip ini</h3>
               <p>Buat dokumen baru atau ubah kata pencarian dan filter.</p>
             </div>
@@ -868,7 +874,7 @@ export default function DashboardPage() {
         </section>
 
         <footer className="dashboard-footer">
-          <span>SMKPD AI Professional v2.3</span>
+          <span>SMKPD AI Official Logo v2.4.1</span>
           <span>SMK Pelayaran Demak Boarding School • 2026</span>
         </footer>
       </section>

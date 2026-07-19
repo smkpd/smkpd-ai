@@ -7,7 +7,7 @@ type ChatMessage = { role: "user" | "assistant"; text: string };
 type Mode = "umum" | "english" | "nautika" | "teknika" | "soal" | "surat";
 
 const modes: { id: Mode; icon: string; title: string; subtitle: string; example: string }[] = [
-  { id: "umum", icon: "🤖", title: "AI Assistant", subtitle: "Asisten sekolah serbaguna", example: "Jelaskan fungsi SMKPD AI secara singkat." },
+  { id: "umum", icon: "/logo-smkpd-64.png", title: "AI Assistant", subtitle: "Asisten sekolah serbaguna", example: "Jelaskan fungsi SMKPD AI secara singkat." },
   { id: "english", icon: "📚", title: "Maritime English", subtitle: "Latihan komunikasi maritim", example: "Buat percakapan singkat antara captain dan cadet saat handover jaga." },
   { id: "nautika", icon: "⚓", title: "AI Nautika", subtitle: "Navigasi, COLREG, deck", example: "Jelaskan COLREG Rule 13 dengan bahasa sederhana." },
   { id: "teknika", icon: "⚙️", title: "AI Teknika", subtitle: "Mesin dan sistem kapal", example: "Jelaskan sistem pendingin main engine kapal." },

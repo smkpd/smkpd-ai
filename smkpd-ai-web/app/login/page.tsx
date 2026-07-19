@@ -69,7 +69,7 @@ export default function LoginPage() {
 
         <div className="login-card">
           <div className="login-card-header">
-            <span className="login-lock">🔐</span>
+            <span className="login-lock logo-lock"><img src="/logo-smkpd-64.png" alt="" /></span>
             <div>
               <p>PORTAL PENGGUNA</p>
               <h2>Masuk ke Dashboard</h2>

@@ -1,0 +1,25 @@
+{
+  "name": "SMKPD AI – Smart Maritime Education Platform",
+  "short_name": "SMKPD AI",
+  "description": "Platform AI resmi SMK Pelayaran Demak Boarding School.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#061a33",
+  "theme_color": "#061a33",
+  "lang": "id",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo-smkpd-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-smkpd-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

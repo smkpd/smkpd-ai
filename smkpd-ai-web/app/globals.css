@@ -1108,3 +1108,48 @@ footer p { margin: 3px 0 0; font-size: 12px; }
     justify-content: flex-end;
   }
 }
+
+
+/* ==================================
+   SMKPD AI V2.4 OFFICIAL LOGO
+   ================================== */
+.brand img,
+.dash-brand img,
+.login-identity > img,
+.dashboard-hero img,
+.dashboard-loading img {
+  object-fit: contain;
+}
+.logo-lock {
+  overflow: hidden;
+  padding: 5px;
+  background: #ffffff;
+  box-shadow: 0 6px 16px rgba(7, 31, 59, .12);
+}
+.logo-lock img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.service-logo-icon {
+  overflow: hidden;
+  padding: 3px;
+  background: white !important;
+}
+.service-logo-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.result-empty-logo,
+.archive-empty-logo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  margin: 0 auto;
+  filter: drop-shadow(0 8px 14px rgba(8, 38, 70, .12));
+}
+.archive-empty-logo {
+  width: 64px;
+  height: 64px;
+}
