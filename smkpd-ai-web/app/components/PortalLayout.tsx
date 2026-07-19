@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import { loadSession, Role, Session } from "../lib/client";
 import { hasPermission, Permission } from "../lib/access";
+import { migrateLegacyData } from "../lib/database";
 
 type Props = {
   title: string;
@@ -22,26 +23,65 @@ type NavItem = {
   roles?: Role[];
 };
 
-const navigation: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: "▦" },
-  { href: "/ai", label: "AI Profesional", icon: "✦" },
-  { href: "/maritime", label: "Maritime Learning", icon: "⚓" },
-  { href: "/academic", label: "Akademik", icon: "📖" },
-  { href: "/services", label: "Layanan Sekolah", icon: "🏫" },
-  { href: "/knowledge", label: "PDF & Knowledge", icon: "📂" },
+type NavGroup = {
+  title: string;
+  items: NavItem[];
+};
+
+const groups: NavGroup[] = [
   {
-    href: "/users",
-    label: "Manajemen Pengguna",
-    icon: "👥",
-    permission: "manage_users",
+    title: "UTAMA",
+    items: [{ href: "/dashboard", label: "Dashboard", icon: "▦" }],
   },
   {
-    href: "/kepala-sekolah",
-    label: "Dashboard Eksekutif",
-    icon: "📊",
-    permission: "executive_dashboard",
+    title: "PEMBELAJARAN",
+    items: [
+      { href: "/ai", label: "AI Pembelajaran", icon: "✦" },
+      { href: "/knowledge", label: "Perpustakaan AI", icon: "📚" },
+      { href: "/maritime", label: "Simulator Maritim", icon: "⚓" },
+      { href: "/academic", label: "Akademik & CBT", icon: "📖" },
+    ],
   },
-  { href: "/presentasi", label: "Mode Presentasi", icon: "▶" },
+  {
+    title: "LAYANAN",
+    items: [
+      { href: "/services", label: "Layanan Taruna", icon: "🏫" },
+    ],
+  },
+  {
+    title: "ADMINISTRASI",
+    items: [
+      {
+        href: "/generator",
+        label: "Generator Dokumen",
+        icon: "📄",
+        permission: "manage_generators",
+      },
+    ],
+  },
+  {
+    title: "SISTEM",
+    items: [
+      {
+        href: "/database",
+        label: "Database & Excel",
+        icon: "🗄️",
+        roles: ["Admin", "Kepala Sekolah"],
+      },
+      {
+        href: "/users",
+        label: "Pengguna & Akses",
+        icon: "👥",
+        permission: "manage_users",
+      },
+      {
+        href: "/kepala-sekolah",
+        label: "Dashboard Eksekutif",
+        icon: "📊",
+        permission: "executive_dashboard",
+      },
+    ],
+  },
 ];
 
 export default function PortalLayout({
@@ -57,42 +97,58 @@ export default function PortalLayout({
   const [ready, setReady] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const allowedRolesKey = allowedRoles?.join("|") || "";
+
   useEffect(() => {
-    const activeSession = loadSession();
+    async function prepare() {
+      const activeSession = loadSession();
 
-    if (!activeSession) {
-      router.replace("/login");
-      return;
+      if (!activeSession) {
+        router.replace("/login");
+        return;
+      }
+
+      if (allowedRoles && !allowedRoles.includes(activeSession.role)) {
+        router.replace("/dashboard");
+        return;
+      }
+
+      if (
+        requiredPermission &&
+        !hasPermission(activeSession.role, requiredPermission)
+      ) {
+        router.replace("/dashboard");
+        return;
+      }
+
+      await migrateLegacyData();
+      setSession(activeSession);
+      setReady(true);
     }
 
-    if (allowedRoles && !allowedRoles.includes(activeSession.role)) {
-      router.replace("/dashboard");
-      return;
-    }
-
-    if (
-      requiredPermission &&
-      !hasPermission(activeSession.role, requiredPermission)
-    ) {
-      router.replace("/dashboard");
-      return;
-    }
-
-    setSession(activeSession);
-    setReady(true);
-  }, [allowedRoles, requiredPermission, router]);
+    prepare();
+  }, [allowedRolesKey, requiredPermission, router]);
 
   useEffect(() => setMenuOpen(false), [pathname]);
 
-  const visibleNavigation = useMemo(() => {
+  const visibleGroups = useMemo(() => {
     if (!session) return [];
-    return navigation.filter((item) => {
-      if (item.roles && !item.roles.includes(session.role)) return false;
-      if (item.permission && !hasPermission(session.role, item.permission)) {
-        return false;
-      }
-      return true;
-    });
+
+    return groups
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((item) => {
+          if (item.roles && !item.roles.includes(session.role)) return false;
+          if (
+            item.permission &&
+            !hasPermission(session.role, item.permission)
+          ) {
+            return false;
+          }
+          return true;
+        }),
+      }))
+      .filter((group) => group.items.length);
   }, [session]);
 
   function logout() {
@@ -128,7 +184,7 @@ export default function PortalLayout({
           <img src="/logo-smkpd-192.png" alt="Logo SMKPD" />
           <div>
             <strong>SMKPD AI</strong>
-            <span>School Super App v4.0</span>
+            <span>Database Edition v5.0</span>
           </div>
         </Link>
 
@@ -150,25 +206,23 @@ export default function PortalLayout({
           </div>
         </div>
 
-        <nav className="suite-nav">
-          {visibleNavigation.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={pathname === item.href ? "active" : ""}
-              onClick={() => setMenuOpen(false)}
-            >
-              <span>{item.icon}</span>{item.label}
-            </Link>
+        <nav className="suite-nav grouped-nav">
+          {visibleGroups.map((group) => (
+            <section key={group.title}>
+              <p>{group.title}</p>
+              {group.items.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={pathname === item.href ? "active" : ""}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <span>{item.icon}</span>{item.label}
+                </Link>
+              ))}
+            </section>
           ))}
         </nav>
-
-        <div className="suite-specialists">
-          <p>AI SPESIALIS</p>
-          <a href="/ai?mode=nautika">⚓ AI Nautika</a>
-          <a href="/ai?mode=teknika">⚙️ AI Teknika</a>
-          <a href="/ai?mode=english">📚 Maritime English</a>
-        </div>
 
         <button className="suite-logout" onClick={logout}>
           Keluar dari Akun
@@ -189,12 +243,17 @@ export default function PortalLayout({
             <span>{subtitle}</span>
           </div>
           <div className="suite-top-actions">
-            <Link href="/presentasi">▶ Presentasi</Link>
             <Link href="/">Beranda</Link>
           </div>
         </header>
 
         <div className="suite-body">{children}</div>
+
+        <footer className="system-credit">
+          <span>SMKPD AI Database Edition v5.0</span>
+          <strong>Dibuat oleh Syaiful Bahri, M. Pd</strong>
+          <span>Contact: 082335339994</span>
+        </footer>
       </section>
     </main>
   );

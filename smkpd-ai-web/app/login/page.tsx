@@ -23,9 +23,9 @@ export default function LoginPage() {
     loadUsers();
   }, []);
 
-  function login(event: FormEvent) {
+  async function login(event: FormEvent) {
     event.preventDefault();
-    const account = authenticate(username, password);
+    const account = await authenticate(username, password);
 
     if (!account) {
       setError("Username, password, atau status akun tidak sesuai.");
@@ -123,9 +123,13 @@ export default function LoginPage() {
           </div>
 
           <p className="login-warning">
-            Versi presentasi menyimpan akun pada browser. Jangan gunakan
-            password pribadi atau data rahasia untuk penggunaan produksi.
+            Database Edition menyimpan data lokal pada browser dan dapat
+            disinkronkan ke database cloud setelah konfigurasi.
           </p>
+          <div className="creator-credit">
+            Dibuat oleh <strong>Syaiful Bahri, M. Pd</strong><br/>
+            Contact: 082335339994
+          </div>
         </div>
       </section>
     </main>

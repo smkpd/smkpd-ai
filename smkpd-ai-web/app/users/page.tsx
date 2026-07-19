@@ -32,7 +32,7 @@ export default function UsersPage() {
   const [search, setSearch] = useState("");
   const [notice, setNotice] = useState("");
 
-  useEffect(() => setUsers(loadUsers()), []);
+  useEffect(() => { loadUsers().then(setUsers); }, []);
 
   const filtered = useMemo(() => {
     const keyword = search.trim().toLowerCase();
@@ -44,7 +44,7 @@ export default function UsersPage() {
     );
   }, [search, users]);
 
-  function submit(event: FormEvent) {
+  async function submit(event: FormEvent) {
     event.preventDefault();
     const username = form.username.trim().toLowerCase();
 
@@ -65,13 +65,13 @@ export default function UsersPage() {
       isActive: true,
     });
     const next = [user, ...users];
-    saveUsers(next);
+    await saveUsers(next);
     setUsers(next);
     setForm(blankForm);
     setNotice("Pengguna baru berhasil ditambahkan.");
   }
 
-  function toggleUser(user: SchoolUser) {
+  async function toggleUser(user: SchoolUser) {
     if (user.username === "admin" || user.username === "kepala") {
       setNotice("Akun inti Admin dan Kepala Sekolah tidak dapat dinonaktifkan.");
       return;
@@ -79,11 +79,11 @@ export default function UsersPage() {
     const next = users.map((item) =>
       item.id === user.id ? { ...item, isActive: !item.isActive } : item
     );
-    saveUsers(next);
+    await saveUsers(next);
     setUsers(next);
   }
 
-  function resetPassword(user: SchoolUser) {
+  async function resetPassword(user: SchoolUser) {
     const password = window.prompt(
       `Masukkan password baru untuk ${user.name} (minimal 6 karakter):`
     );
@@ -96,19 +96,19 @@ export default function UsersPage() {
     const next = users.map((item) =>
       item.id === user.id ? { ...item, password } : item
     );
-    saveUsers(next);
+    await saveUsers(next);
     setUsers(next);
     setNotice(`Password ${user.name} berhasil diperbarui.`);
   }
 
-  function removeUser(user: SchoolUser) {
+  async function removeUser(user: SchoolUser) {
     if (user.username === "admin" || user.username === "kepala") {
       setNotice("Akun inti tidak dapat dihapus.");
       return;
     }
     if (!window.confirm(`Hapus akun ${user.name}?`)) return;
     const next = users.filter((item) => item.id !== user.id);
-    saveUsers(next);
+    await saveUsers(next);
     setUsers(next);
     setNotice("Akun berhasil dihapus.");
   }

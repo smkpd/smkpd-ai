@@ -10,6 +10,7 @@ import {
   saveArray,
   UsageLog,
 } from "../lib/client";
+import { dbGetAll, dbPutOne } from "../lib/database";
 
 type Tab = "library" | "tour" | "bridge" | "engine" | "smcp" | "cbt";
 
@@ -198,7 +199,7 @@ function extractJson(value: string) {
 }
 
 export default function MaritimePage() {
-  const [tab, setTab] = useState<Tab>("library");
+  const [tab, setTab] = useState<Tab>("tour");
   const [library, setLibrary] = useState<LibraryItem[]>(defaultLibrary);
   const [selectedStation, setSelectedStation] = useState(shipStations[0]);
   const [bridgeScore, setBridgeScore] = useState(0);
@@ -214,8 +215,17 @@ export default function MaritimePage() {
   const [notice, setNotice] = useState("");
 
   useEffect(() => {
-    const saved = loadArray<LibraryItem>("smkpd_library");
-    if (saved.length) setLibrary(saved);
+    dbGetAll("library").then((saved: any[]) => {
+      if (saved.length) {
+        setLibrary(saved.map((item) => ({
+          id: item.id,
+          title: item.judul,
+          category: item.kategori,
+          level: item.tingkat,
+          description: item.deskripsi,
+        })));
+      }
+    });
   }, []);
 
   function addLibraryItem() {
@@ -233,7 +243,16 @@ export default function MaritimePage() {
     };
     const next = [item, ...library];
     setLibrary(next);
-    saveArray("smkpd_library", next, 100);
+    dbPutOne("library", {
+      id: item.id,
+      kode: item.id,
+      judul: item.title,
+      kategori: item.category,
+      tingkat: item.level,
+      deskripsi: item.description,
+      sumber_url: "",
+      status: "Aktif",
+    });
   }
 
   function answerScenario(
@@ -290,9 +309,30 @@ Pastikan tepat satu jawaban benar dan sesuai tingkat SMK.
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Soal belum berhasil dibuat.");
       const questions = extractJson(String(data.text || ""));
-      setCbtQuestions(Array.isArray(questions) ? questions : []);
+      const validQuestions = Array.isArray(questions) ? questions : [];
+      setCbtQuestions(validQuestions);
       setCbtAnswers({});
-      setNotice("Bank Soal CBT berhasil dibuat oleh AI.");
+      for (let index = 0; index < validQuestions.length; index += 1) {
+        const question = validQuestions[index];
+        await dbPutOne("question_bank", {
+          id: createId(),
+          kode: `AI-${Date.now()}-${index + 1}`,
+          mata_pelajaran: "Maritim",
+          topik: cbtTopic,
+          kelas: "SMK",
+          jenis: "Pilihan Ganda",
+          soal: question.question,
+          opsi_a: question.options?.[0] || "",
+          opsi_b: question.options?.[1] || "",
+          opsi_c: question.options?.[2] || "",
+          opsi_d: question.options?.[3] || "",
+          opsi_e: question.options?.[4] || "",
+          jawaban: question.answer,
+          pembahasan: question.explanation,
+          tingkat_kesulitan: "Campuran",
+        });
+      }
+      setNotice("Bank Soal CBT berhasil dibuat dan disimpan ke database.");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Terjadi kendala.");
     } finally {
@@ -330,17 +370,15 @@ Pastikan tepat satu jawaban benar dan sesuai tingkat SMK.
 
   return (
     <PortalLayout
-      title="Maritime Learning Center"
-      subtitle="Perpustakaan AI, Virtual Ship Tour, simulator dasar, SMCP, dan Bank Soal CBT."
+      title="Simulator Maritim"
+      subtitle="Virtual Ship Tour, Bridge Simulator, Engine Room Simulator, dan latihan SMCP."
     >
       <div className="module-tabs">
         {[
-          ["library", "📚 Perpustakaan"],
           ["tour", "🚢 Virtual Ship Tour"],
           ["bridge", "⚓ Bridge Simulator"],
           ["engine", "🔧 Engine Simulator"],
-          ["smcp", "📻 SMCP"],
-          ["cbt", "📝 Bank Soal CBT"],
+          ["smcp", "📻 Latihan SMCP"],
         ].map(([id, label]) => (
           <button
             key={id}

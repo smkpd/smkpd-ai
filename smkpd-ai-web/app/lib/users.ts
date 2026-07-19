@@ -1,4 +1,10 @@
 import { createId, Role } from "./client";
+import {
+  dbGetAll,
+  dbReplaceModule,
+  dbUpsertMany,
+  migrateLegacyData,
+} from "./database";
 
 export type SchoolUser = {
   id: string;
@@ -10,8 +16,6 @@ export type SchoolUser = {
   isActive: boolean;
   createdAt: string;
 };
-
-const USER_KEY = "smkpd_users";
 
 export const seedUsers: SchoolUser[] = [
   {
@@ -62,43 +66,59 @@ export const seedUsers: SchoolUser[] = [
   },
 ];
 
-export function loadUsers(): SchoolUser[] {
-  if (typeof window === "undefined") return seedUsers;
+function toDbUser(user: SchoolUser) {
+  return {
+    id: user.id,
+    nama: user.name,
+    username: user.username,
+    password: user.password,
+    role: user.role,
+    kelas_identitas: user.className || "",
+    status: user.isActive ? "Aktif" : "Nonaktif",
+    dibuat_pada: user.createdAt,
+  };
+}
 
-  try {
-    const raw = localStorage.getItem(USER_KEY);
-    if (!raw) {
-      localStorage.setItem(USER_KEY, JSON.stringify(seedUsers));
-      return seedUsers;
-    }
+function fromDbUser(value: any): SchoolUser {
+  return {
+    id: String(value.id || createId()),
+    name: String(value.nama || value.name || ""),
+    username: String(value.username || ""),
+    password: String(value.password || ""),
+    role: value.role as Role,
+    className: String(value.kelas_identitas || value.className || ""),
+    isActive:
+      value.status === undefined
+        ? value.isActive !== false
+        : String(value.status).toLowerCase() !== "nonaktif",
+    createdAt: String(value.dibuat_pada || value.createdAt || new Date().toISOString()),
+  };
+}
 
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      localStorage.setItem(USER_KEY, JSON.stringify(seedUsers));
-      return seedUsers;
-    }
+export async function loadUsers(): Promise<SchoolUser[]> {
+  await migrateLegacyData();
+  let users = (await dbGetAll("users")).map(fromDbUser);
 
-    const existingUsernames = new Set(parsed.map((item) => item.username));
-    const missingSeeds = seedUsers.filter(
-      (seed) => !existingUsernames.has(seed.username)
-    );
-    const merged = [...parsed, ...missingSeeds];
-    if (missingSeeds.length) {
-      localStorage.setItem(USER_KEY, JSON.stringify(merged));
-    }
-    return merged;
-  } catch {
-    localStorage.setItem(USER_KEY, JSON.stringify(seedUsers));
-    return seedUsers;
+  const existing = new Set(users.map((user) => user.username.toLowerCase()));
+  const missingSeeds = seedUsers.filter(
+    (seed) => !existing.has(seed.username.toLowerCase())
+  );
+
+  if (missingSeeds.length) {
+    await dbUpsertMany("users", missingSeeds.map(toDbUser), "manual");
+    users = [...users, ...missingSeeds];
   }
+
+  return users;
 }
 
-export function saveUsers(users: SchoolUser[]) {
-  localStorage.setItem(USER_KEY, JSON.stringify(users));
+export async function saveUsers(users: SchoolUser[]) {
+  await dbReplaceModule("users", users.map(toDbUser), "manual");
 }
 
-export function authenticate(username: string, password: string) {
-  return loadUsers().find(
+export async function authenticate(username: string, password: string) {
+  const users = await loadUsers();
+  return users.find(
     (user) =>
       user.isActive &&
       user.username.toLowerCase() === username.trim().toLowerCase() &&

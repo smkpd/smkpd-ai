@@ -291,7 +291,8 @@ export default function Home() {
           <strong>SMKPD AI</strong>
           <p>SMK Pelayaran Demak Boarding School</p>
         </div>
-        <span>© 2026 • School Super App v4.0</span>
+        <span>© 2026 • Database Edition v5.0</span>
+        <div className="home-credit">Dibuat oleh <strong>Syaiful Bahri, M. Pd</strong> • Contact: 082335339994</div>
       </footer>
     </main>
   );

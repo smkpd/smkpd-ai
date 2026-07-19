@@ -179,8 +179,8 @@ Jawab secara jelas. Bila informasi tidak tersedia dalam dokumen, katakan bahwa i
 
   return (
     <PortalLayout
-      title="PDF & AI Knowledge Base"
-      subtitle="Unggah PDF, buat ringkasan, simpan pengetahuan, dan tanyakan isi dokumen."
+      title="Perpustakaan AI Maritim"
+      subtitle="Koleksi PDF dan pengetahuan maritim sekolah yang dapat ditanyakan kepada AI."
     >
       <section className="knowledge-layout">
         <aside className="knowledge-sidebar">

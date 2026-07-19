@@ -4045,3 +4045,260 @@ img {
     min-width: 190px;
   }
 }
+
+
+/* ==========================================================
+   SMKPD AI V5.0 — DATABASE EDITION
+   ========================================================== */
+.grouped-nav {
+  display: block;
+}
+.grouped-nav section {
+  margin-bottom: 13px;
+}
+.grouped-nav section > p {
+  margin: 0 11px 5px;
+  color: #7089a0;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .17em;
+}
+.system-credit {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 18px 5px 24px;
+  color: #718499;
+  font-size: 9px;
+}
+.system-credit strong {
+  color: #244864;
+}
+.creator-credit {
+  margin-top: 13px;
+  padding: 10px;
+  border: 1px solid #d8e2eb;
+  border-radius: 9px;
+  color: #526b81;
+  text-align: center;
+  font-size: 10px;
+  background: #f7fafc;
+}
+.home-credit {
+  width: 100%;
+  margin-top: 8px;
+  color: #94a7ba;
+  text-align: center;
+  font-size: 9px;
+}
+
+.clean-dashboard-hero {
+  min-height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 30px;
+  color: white;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 88% 15%, rgba(38,139,219,.42), transparent 20rem),
+    linear-gradient(120deg,#061a33,#0a3966);
+}
+.clean-dashboard-hero h2 {
+  margin: 5px 0 8px;
+  font-size: clamp(27px,4vw,40px);
+}
+.clean-dashboard-hero p:last-child {
+  margin: 0;
+  color: #bfd0e1;
+}
+.clean-dashboard-hero img {
+  width: 125px;
+  height: 125px;
+  object-fit: contain;
+}
+.clean-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+.clean-dashboard-card {
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  padding: 19px;
+  border: 1px solid #d9e3ec;
+  border-top: 4px solid #0b6eae;
+  border-radius: 14px;
+  color: #153651;
+  text-decoration: none;
+  background: white;
+}
+.clean-dashboard-card.gold {border-top-color:#d4a928}
+.clean-dashboard-card.green {border-top-color:#2a9d69}
+.clean-dashboard-card.purple {border-top-color:#7456b8}
+.clean-dashboard-card > span {font-size:29px}
+.clean-dashboard-card h3 {margin:13px 0 7px;font-size:15px}
+.clean-dashboard-card p {flex:1;margin:0;color:#718498;font-size:10px;line-height:1.5}
+.clean-dashboard-card strong {margin-top:13px;color:#0a5e9b;font-size:10px}
+.database-summary-card,
+.workflow-card,
+.database-hero-card {
+  margin-top:16px;
+  padding:22px;
+  border:1px solid #d9e3ec;
+  border-radius:15px;
+  background:white;
+}
+.database-summary-card {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+}
+.database-summary-card h2,
+.workflow-card h2,
+.database-hero-card h2 {margin:0;color:#0b2e4d}
+.database-count-chips {display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.database-count-chips span {padding:6px 9px;border-radius:20px;color:#315875;background:#edf4fa;font-size:9px}
+.workflow-card ol {margin:13px 0 0;padding-left:20px;color:#536d83;font-size:11px;line-height:1.65}
+
+.generator-tool-strip {
+  display:flex;
+  gap:7px;
+  margin-bottom:14px;
+  padding:6px;
+  overflow-x:auto;
+  border:1px solid #d8e2eb;
+  border-radius:12px;
+  background:white;
+}
+.generator-tool-strip button {
+  flex:0 0 auto;
+  min-height:41px;
+  padding:0 12px;
+  border:0;
+  border-radius:8px;
+  color:#48647c;
+  cursor:pointer;
+  background:transparent;
+  font-size:10px;
+  font-weight:800;
+}
+.generator-tool-strip button.active {color:#07182d;background:#f4c542}
+.simple-generator-layout {
+  display:grid;
+  grid-template-columns:390px minmax(0,1fr);
+  gap:14px;
+}
+.simple-generator-form,
+.simple-generator-result {
+  border:1px solid #d8e2eb;
+  border-radius:15px;
+  background:white;
+}
+.simple-generator-form {
+  align-self:start;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  padding:18px;
+}
+.simple-generator-form > p,
+.simple-generator-form > h2,
+.simple-generator-form > button,
+.simple-generator-form > .module-notice,
+.simple-generator-form .wide {grid-column:1/-1}
+.simple-generator-form h2 {margin:0 0 4px;color:#0b2e4d}
+.simple-generator-form label {display:grid;gap:5px;color:#23465f;font-size:10px;font-weight:800}
+.simple-generator-form input,
+.simple-generator-form textarea {width:100%;padding:10px;border:1px solid #d1dce6;border-radius:8px;outline:none;color:#17334d}
+.simple-generator-form > button {min-height:43px;border:0;border-radius:9px;color:#07182d;cursor:pointer;font-weight:900;background:#f4c542}
+.simple-generator-result {min-width:0;padding:18px}
+.result-actions {display:flex;gap:6px}
+.result-actions button {min-height:34px;padding:0 9px;border:1px solid #ccd9e4;border-radius:7px;color:#315572;background:white}
+.simple-result-content {min-height:560px;max-height:740px;overflow:auto;padding:22px;border:1px solid #dce5ed;border-radius:10px;background:#fbfdff}
+.empty-state {min-height:400px;display:grid;place-content:center;justify-items:center;color:#73879a;text-align:center}
+.empty-state img {width:75px;height:75px;object-fit:contain}
+.recent-documents-card {margin-top:14px}
+.recent-documents-grid {display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.recent-documents-grid button {min-height:75px;display:flex;flex-direction:column;gap:5px;padding:11px;border:1px solid #dae4ed;border-radius:9px;text-align:left;color:#173a58;background:#fbfdff}
+.recent-documents-grid small {color:#788b9e;font-size:8px}
+
+.database-tabs {margin-bottom:14px}
+.database-hero-card {display:flex;align-items:center;justify-content:space-between;gap:20px;color:white;background:linear-gradient(120deg,#061a33,#0a3966)}
+.database-hero-card h2 {color:white}
+.database-hero-card p:last-child {max-width:720px;color:#bfd1e2}
+.database-hero-card a {flex:0 0 auto;min-height:42px;display:inline-flex;align-items:center;padding:0 13px;border-radius:9px;color:#07182d;text-decoration:none;font-size:10px;font-weight:900;background:#f4c542}
+.database-module-grid {display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-top:14px}
+.database-module-grid button,
+.database-module-grid article {min-height:105px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:13px;border:1px solid #d9e3ec;border-radius:11px;color:#173955;background:white}
+.database-module-grid button {cursor:pointer}
+.database-module-grid span {font-size:22px;font-weight:900;color:#0b5e9d}
+.database-module-grid strong {margin-top:5px;font-size:11px}
+.database-module-grid small {margin-top:3px;color:#7a8d9f;font-size:8px}
+.import-history-list {display:grid;gap:7px}
+.import-history-list article {display:grid;grid-template-columns:1fr auto auto;gap:10px;padding:10px;border:1px solid #dce5ed;border-radius:8px;color:#31516c;font-size:10px;background:#fbfdff}
+.excel-import-layout {display:grid;grid-template-columns:330px minmax(0,1fr);gap:14px}
+.excel-upload-card,
+.excel-preview-card {border:1px solid #d8e2eb;border-radius:15px;background:white;padding:19px}
+.excel-upload-card img {width:70px;height:70px;object-fit:contain}
+.excel-upload-card h2 {margin:7px 0;color:#0b2e4d}
+.excel-upload-card p {color:#6f8397;font-size:10px;line-height:1.55}
+.excel-upload-card a {display:flex;align-items:center;justify-content:center;min-height:39px;margin:12px 0;border-radius:8px;color:#07182d;text-decoration:none;font-weight:900;font-size:10px;background:#f4c542}
+.excel-upload-card label {display:grid;gap:7px;color:#264962;font-size:10px;font-weight:800}
+.excel-upload-card input {padding:9px;border:1px dashed #bdccd8;border-radius:8px}
+.excel-sheet-list {display:grid;gap:8px}
+.excel-sheet-list article {display:grid;grid-template-columns:24px 170px minmax(0,1fr);gap:9px;padding:11px;border:1px solid #dce5ed;border-radius:9px;background:#fbfdff}
+.excel-sheet-list article.has-error {border-color:#efc2c2;background:#fff7f7}
+.excel-sheet-list article > div {display:flex;flex-direction:column;gap:3px}
+.excel-sheet-list span,
+.excel-sheet-list small {color:#73879a;font-size:9px}
+.excel-sheet-list ul {margin:0;padding-left:18px;color:#9c3a3a;font-size:9px}
+.database-browser-head {display:grid;grid-template-columns:1fr 220px auto}
+.database-browser-head select {min-height:38px;border:1px solid #d0dce7;border-radius:8px;padding:0 9px}
+.database-limit-note {color:#7b8d9e;font-size:9px}
+.cloud-database-grid {display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cloud-database-grid .module-card p {color:#6d8296;line-height:1.55}
+.cloud-database-grid .module-card > button,
+.cloud-actions button {min-height:40px;padding:0 12px;border:0;border-radius:8px;color:#07182d;cursor:pointer;font-weight:900;background:#f4c542}
+.cloud-actions {display:flex;gap:7px}
+.executive-module-grid article {min-height:90px}
+.creator-credit strong {color:#0b3558}
+
+@media (max-width:1100px){
+  .clean-dashboard-grid{grid-template-columns:repeat(2,1fr)}
+  .database-module-grid{grid-template-columns:repeat(4,1fr)}
+  .recent-documents-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:820px){
+  .clean-dashboard-hero{min-height:160px;padding:22px 17px}
+  .clean-dashboard-hero img{width:85px;height:85px;opacity:.24}
+  .clean-dashboard-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .clean-dashboard-card{min-height:150px;padding:14px}
+  .database-summary-card{align-items:flex-start;flex-direction:column}
+  .database-count-chips{justify-content:flex-start}
+  .simple-generator-layout,
+  .excel-import-layout,
+  .cloud-database-grid{grid-template-columns:1fr}
+  .simple-generator-form{grid-template-columns:1fr}
+  .simple-generator-form > *{grid-column:auto}
+  .simple-generator-form .wide{grid-column:auto}
+  .simple-result-content{min-height:400px;max-height:65vh;padding:14px}
+  .database-module-grid{grid-template-columns:repeat(3,1fr)}
+  .excel-sheet-list article{grid-template-columns:22px minmax(0,1fr)}
+  .excel-sheet-list ul{grid-column:1/-1}
+  .database-browser-head{grid-template-columns:1fr}
+  .import-history-list article{grid-template-columns:1fr}
+}
+@media (max-width:500px){
+  .clean-dashboard-grid{grid-template-columns:1fr}
+  .clean-dashboard-card{min-height:128px}
+  .database-module-grid{grid-template-columns:repeat(2,1fr)}
+  .recent-documents-grid{grid-template-columns:1fr}
+  .database-hero-card{align-items:flex-start;flex-direction:column}
+  .system-credit{flex-direction:column;align-items:center}
+}
