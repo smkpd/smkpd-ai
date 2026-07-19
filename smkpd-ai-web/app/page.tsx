@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 type ChatMessage = { role: "user" | "assistant"; text: string };
 type Mode = "umum" | "english" | "nautika" | "teknika" | "soal" | "surat";
@@ -30,8 +31,8 @@ export default function Home() {
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-  endRef.current?.scrollIntoView({ behavior: "smooth" });
-}, [messages, loading]);
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
 
   const active = modes.find((item) => item.id === mode)!;
 
@@ -113,6 +114,7 @@ export default function Home() {
         </div>
 
         <div className="nav-actions">
+          <Link className="dashboard-link" href="/login">Masuk Dashboard</Link>
           <select aria-label="Peran pengguna" value={role} onChange={(e) => setRole(e.target.value)}>
             <option>Admin</option>
             <option>Guru</option>
@@ -137,6 +139,7 @@ export default function Home() {
           </p>
           <div className="hero-buttons">
             <a href="#assistant" className="primary-btn">Mulai Gunakan AI</a>
+            <Link href="/login" className="secondary-btn">Dashboard Guru</Link>
             <span className="status"><i /> Sistem demo aktif</span>
           </div>
           <div className="stats">
@@ -259,7 +262,7 @@ export default function Home() {
           <strong>SMKPD AI</strong>
           <p>SMK Pelayaran Demak Boarding School</p>
         </div>
-        <span>© 2026 • Demo Version 1.0</span>
+        <span>© 2026 • Professional Demo v2.0</span>
       </footer>
     </main>
   );
