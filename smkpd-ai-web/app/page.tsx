@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import RichText from "./components/RichText";
 
 type ChatMessage = { role: "user" | "assistant"; text: string };
 type Mode = "umum" | "english" | "nautika" | "teknika" | "soal" | "surat";
@@ -47,10 +48,21 @@ export default function Home() {
     setLoading(true);
 
     try {
+      const requestMessage =
+        mode === "english"
+          ? `${message}\n\nUse Maritime English first, then provide concise Indonesian translation, correction, practice response, and pronunciation guidance when relevant.`
+          : message;
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode, role, language, message, history: nextMessages.slice(-8) }),
+        body: JSON.stringify({
+          mode,
+          role,
+          language,
+          message: requestMessage,
+          history: nextMessages.slice(-8),
+        }),
       });
 
       const data = await response.json();
@@ -174,6 +186,7 @@ export default function Home() {
               className={`feature-card ${mode === item.id ? "active" : ""}`}
               onClick={() => {
                 setMode(item.id);
+                if (item.id === "english") setLanguage("en");
                 document.getElementById("assistant")?.scrollIntoView({ behavior: "smooth" });
               }}
             >
@@ -204,6 +217,12 @@ export default function Home() {
           <button className="example-button" onClick={() => setInput(active.example)}>
             “{active.example}”
           </button>
+          <a
+            className="open-full-mode"
+            href={active.id === "umum" ? "/ai" : `/ai?mode=${active.id}`}
+          >
+            Buka {active.title} versi penuh →
+          </a>
           <div className="demo-note">
             <strong>Mode Demo</strong>
             <p>Portal v3 menyediakan generator, AI maritim, PDF Knowledge Base, voice, arsip, dan statistik kepala sekolah.</p>
@@ -226,7 +245,13 @@ export default function Home() {
             {messages.map((item, index) => (
               <div key={index} className={`message ${item.role}`}>
                 <span className="avatar">{item.role === "assistant" ? "⚓" : "👤"}</span>
-                <div>{item.text}</div>
+                <div>
+                  {item.role === "assistant" ? (
+                    <RichText text={item.text} />
+                  ) : (
+                    item.text
+                  )}
+                </div>
               </div>
             ))}
             {loading && (
@@ -266,7 +291,7 @@ export default function Home() {
           <strong>SMKPD AI</strong>
           <p>SMK Pelayaran Demak Boarding School</p>
         </div>
-        <span>© 2026 • Presentation Edition v3.0</span>
+        <span>© 2026 • Mobile Edition v3.1</span>
       </footer>
     </main>
   );

@@ -21,24 +21,29 @@ const modes: Array<{
   title: string;
   icon: string;
   description: string;
+  welcome: string;
   prompts: string[];
 }> = [
   {
     id: "umum",
     title: "AI Assistant",
     icon: "✦",
-    description: "Asisten pembelajaran dan administrasi sekolah.",
+    description: "Pembelajaran dan administrasi sekolah.",
+    welcome:
+      "AI Assistant aktif. Tuliskan kebutuhan pembelajaran atau administrasi sekolah Anda.",
     prompts: [
-      "Buat rencana kegiatan pembelajaran yang aktif untuk kelas X.",
-      "Jelaskan konsep ini menggunakan bahasa yang mudah dipahami taruna.",
-      "Buat ringkasan dan pertanyaan evaluasi dari materi berikut.",
+      "Buat rencana kegiatan pembelajaran aktif untuk kelas X.",
+      "Ringkas materi berikut dan buat lima pertanyaan evaluasi.",
+      "Jelaskan konsep ini dengan bahasa sederhana untuk taruna.",
     ],
   },
   {
     id: "nautika",
     title: "AI Nautika",
     icon: "⚓",
-    description: "Navigasi, COLREG, deck operation, muatan, dan dinas jaga.",
+    description: "Navigasi, COLREG, deck, muatan, dan dinas jaga.",
+    welcome:
+      "AI Nautika aktif. Saya siap membantu navigasi, COLREG, deck operation, muatan, keselamatan, dan dinas jaga.",
     prompts: [
       "Jelaskan COLREG Rule 13 beserta contoh situasinya.",
       "Buat checklist persiapan lepas sandar untuk taruna Nautika.",
@@ -49,7 +54,9 @@ const modes: Array<{
     id: "teknika",
     title: "AI Teknika",
     icon: "⚙️",
-    description: "Mesin induk, pesawat bantu, sistem kapal, dan perawatan.",
+    description: "Mesin, sistem kapal, troubleshooting, dan perawatan.",
+    welcome:
+      "AI Teknika aktif. Saya siap membantu mesin induk, pesawat bantu, sistem kapal, perawatan, dan troubleshooting.",
     prompts: [
       "Jelaskan alur sistem pendingin tertutup main engine.",
       "Buat checklist persiapan mesin sebelum keberangkatan.",
@@ -60,27 +67,31 @@ const modes: Array<{
     id: "english",
     title: "Maritime English",
     icon: "📚",
-    description: "Percakapan, SMCP, kosakata, pelafalan, dan koreksi.",
+    description: "SMCP, conversation, vocabulary, grammar, dan pronunciation.",
+    welcome:
+      "Maritime English mode is active. Ask for a dialogue, vocabulary lesson, SMCP practice, grammar correction, or pronunciation guidance. Penjelasan Bahasa Indonesia akan tetap disertakan.",
     prompts: [
-      "Buat dialog bridge watch handover beserta arti Indonesia.",
-      "Latih saya memberikan steering commands yang benar.",
-      "Koreksi kalimat Maritime English berikut dan jelaskan kesalahannya.",
+      "Create a bridge watch handover dialogue with Indonesian translation.",
+      "Train me to give standard steering commands and correct my responses.",
+      "Teach 15 engine-room vocabulary words with examples and pronunciation guidance.",
+      "Correct this sentence: Captain, the ship already arrive at pilot station.",
     ],
   },
 ];
+
+function getModeFromLocation(): Mode {
+  if (typeof window === "undefined") return "umum";
+  const value = new URLSearchParams(window.location.search).get("mode");
+  return value && ["umum", "nautika", "teknika", "english"].includes(value)
+    ? (value as Mode)
+    : "umum";
+}
 
 export default function ProfessionalAiPage() {
   const [mode, setMode] = useState<Mode>("umum");
   const [language, setLanguage] = useState<"id" | "en">("id");
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      text:
-        "Selamat datang di AI Profesional SMKPD. Pilih mode AI, gunakan mikrofon bila diperlukan, lalu tuliskan pertanyaan Anda.",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [knowledge, setKnowledge] = useState<KnowledgeRecord[]>([]);
   const [knowledgeId, setKnowledgeId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -89,12 +100,33 @@ export default function ProfessionalAiPage() {
   const [notice, setNotice] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const queryMode = new URLSearchParams(window.location.search).get("mode");
-    if (queryMode && ["umum", "nautika", "teknika", "english"].includes(queryMode)) {
-      setMode(queryMode as Mode);
+  function activateMode(nextMode: Mode, updateUrl = true) {
+    const selected = modes.find((item) => item.id === nextMode) || modes[0];
+    setMode(nextMode);
+    setLanguage(nextMode === "english" ? "en" : "id");
+    setMessages([
+      {
+        id: createId(),
+        role: "assistant",
+        text: selected.welcome,
+      },
+    ]);
+    setInput("");
+    setNotice("");
+
+    if (updateUrl) {
+      const url = nextMode === "umum" ? "/ai" : `/ai?mode=${nextMode}`;
+      window.history.replaceState({}, "", url);
     }
+  }
+
+  useEffect(() => {
+    activateMode(getModeFromLocation(), false);
     setKnowledge(loadArray<KnowledgeRecord>("smkpd_knowledge"));
+
+    const syncFromBrowser = () => activateMode(getModeFromLocation(), false);
+    window.addEventListener("popstate", syncFromBrowser);
+    return () => window.removeEventListener("popstate", syncFromBrowser);
   }, []);
 
   useEffect(() => {
@@ -112,20 +144,27 @@ export default function ProfessionalAiPage() {
 
   async function submit(event?: FormEvent) {
     event?.preventDefault();
-    const message = input.trim();
-    if (!message || loading) return;
+    const userText = input.trim();
+    if (!userText || loading) return;
 
     const session = loadSession();
     if (!session) return;
 
-    const context = selectedKnowledge
-      ? `\n\nKONTEKS DOKUMEN SEKOLAH:\nJudul: ${selectedKnowledge.title}\n${selectedKnowledge.content.slice(0, 18000)}\n\nJawab berdasarkan konteks dokumen tersebut. Bila jawabannya tidak ada di dokumen, katakan dengan jujur.`
+    const englishInstruction =
+      mode === "english"
+        ? "\n\nMARITIME ENGLISH INSTRUCTION: Use English first, then provide concise Indonesian translation/explanation. Include correct maritime terminology, a practice response, and pronunciation guidance when relevant."
+        : "";
+
+    const documentContext = selectedKnowledge
+      ? `\n\nDOCUMENT CONTEXT:\nTitle: ${selectedKnowledge.title}\n${selectedKnowledge.content.slice(0, 18000)}\n\nUse this document when relevant. If the answer is not found in it, say so honestly.`
       : "";
+
+    const requestMessage = `${userText}${englishInstruction}${documentContext}`;
 
     const userMessage: Message = {
       id: createId(),
       role: "user",
-      text: message,
+      text: userText,
     };
     const nextMessages = [...messages, userMessage];
 
@@ -142,7 +181,7 @@ export default function ProfessionalAiPage() {
           mode,
           role: session.role,
           language,
-          message: `${message}${context}`,
+          message: requestMessage,
           history: nextMessages
             .slice(-8)
             .map((item) => ({ role: item.role, text: item.text })),
@@ -162,19 +201,29 @@ export default function ProfessionalAiPage() {
         id: createId(),
         type: "chat",
         mode,
-        title: message.slice(0, 80),
+        title: userText.slice(0, 80),
         role: session.role,
         createdAt: new Date().toISOString(),
-        inputChars: message.length,
+        inputChars: userText.length,
         outputChars: answer.length,
       };
-      saveArray("smkpd_ai_logs", [log, ...loadArray<UsageLog>("smkpd_ai_logs")], 200);
+      saveArray(
+        "smkpd_ai_logs",
+        [log, ...loadArray<UsageLog>("smkpd_ai_logs")],
+        200
+      );
     } catch (error) {
       const text =
-        error instanceof Error ? error.message : "Terjadi kendala saat menghubungi AI.";
+        error instanceof Error
+          ? error.message
+          : "Terjadi kendala saat menghubungi AI.";
       setMessages((previous) => [
         ...previous,
-        { id: createId(), role: "assistant", text: `Terjadi kendala: ${text}` },
+        {
+          id: createId(),
+          role: "assistant",
+          text: `Terjadi kendala: ${text}`,
+        },
       ]);
     } finally {
       setLoading(false);
@@ -187,23 +236,30 @@ export default function ProfessionalAiPage() {
       (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      setNotice("Mikrofon belum didukung browser ini. Gunakan Chrome atau Edge.");
+      setNotice(
+        "Mikrofon belum didukung browser ini. Gunakan Chrome/Edge dan izinkan akses mikrofon."
+      );
       return;
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = language === "id" ? "id-ID" : "en-US";
+    recognition.lang = mode === "english" ? "en-US" : language === "id" ? "id-ID" : "en-US";
     recognition.interimResults = false;
     recognition.continuous = false;
     recognition.onstart = () => {
       setListening(true);
-      setNotice("Silakan berbicara...");
+      setNotice(
+        mode === "english"
+          ? "Speak in English now..."
+          : "Silakan berbicara..."
+      );
     };
     recognition.onresult = (event: any) => {
       setInput(event.results[0][0].transcript);
       setNotice("Suara berhasil diubah menjadi teks.");
     };
-    recognition.onerror = () => setNotice("Suara belum terbaca. Silakan coba lagi.");
+    recognition.onerror = () =>
+      setNotice("Suara belum terbaca. Pastikan izin mikrofon aktif.");
     recognition.onend = () => setListening(false);
     recognition.start();
   }
@@ -216,8 +272,8 @@ export default function ProfessionalAiPage() {
 
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(cleanSpeechText(message.text));
-    utterance.lang = language === "id" ? "id-ID" : "en-US";
-    utterance.rate = 0.95;
+    utterance.lang = mode === "english" ? "en-US" : language === "id" ? "id-ID" : "en-US";
+    utterance.rate = mode === "english" ? 0.86 : 0.94;
     utterance.onstart = () => {
       setSpeakingId(message.id);
       const session = loadSession();
@@ -226,11 +282,15 @@ export default function ProfessionalAiPage() {
           id: createId(),
           type: "voice",
           mode,
-          title: "Membacakan jawaban AI",
+          title: `Pembaca suara ${activeMode.title}`,
           role: session.role,
           createdAt: new Date().toISOString(),
         };
-        saveArray("smkpd_ai_logs", [log, ...loadArray<UsageLog>("smkpd_ai_logs")], 200);
+        saveArray(
+          "smkpd_ai_logs",
+          [log, ...loadArray<UsageLog>("smkpd_ai_logs")],
+          200
+        );
       }
     };
     utterance.onend = () => setSpeakingId("");
@@ -240,21 +300,14 @@ export default function ProfessionalAiPage() {
 
   function clearChat() {
     window.speechSynthesis?.cancel();
-    setMessages([
-      {
-        id: createId(),
-        role: "assistant",
-        text: `Percakapan baru untuk mode ${activeMode.title} telah dimulai.`,
-      },
-    ]);
+    activateMode(mode);
     setSpeakingId("");
-    setNotice("");
   }
 
   return (
     <PortalLayout
       title="AI Profesional"
-      subtitle="Chat multimode, knowledge context, input suara, dan pembaca jawaban."
+      subtitle="AI umum, Nautika, Teknika, Maritime English, knowledge context, dan voice."
     >
       <section className="ai-suite-grid">
         <aside className="ai-mode-panel">
@@ -264,16 +317,7 @@ export default function ProfessionalAiPage() {
               <button
                 key={item.id}
                 className={mode === item.id ? "active" : ""}
-                onClick={() => {
-                  setMode(item.id);
-                  setMessages([
-                    {
-                      id: createId(),
-                      role: "assistant",
-                      text: `${item.title} aktif. ${item.description}`,
-                    },
-                  ]);
-                }}
+                onClick={() => activateMode(item.id)}
               >
                 <span>{item.icon}</span>
                 <div>
@@ -284,31 +328,43 @@ export default function ProfessionalAiPage() {
             ))}
           </div>
 
-          <label className="ai-select-label">
-            Bahasa Jawaban
-            <select
-              value={language}
-              onChange={(event) => setLanguage(event.target.value as "id" | "en")}
-            >
-              <option value="id">Bahasa Indonesia</option>
-              <option value="en">English</option>
-            </select>
-          </label>
+          <div className="ai-settings-grid">
+            <label className="ai-select-label">
+              Bahasa Jawaban
+              <select
+                value={language}
+                onChange={(event) =>
+                  setLanguage(event.target.value as "id" | "en")
+                }
+              >
+                <option value="id">Bahasa Indonesia</option>
+                <option value="en">English</option>
+              </select>
+            </label>
 
-          <label className="ai-select-label">
-            Knowledge Base
-            <select
-              value={knowledgeId}
-              onChange={(event) => setKnowledgeId(event.target.value)}
-            >
-              <option value="">Tanpa dokumen</option>
-              {knowledge.map((record) => (
-                <option key={record.id} value={record.id}>
-                  {record.title}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label className="ai-select-label">
+              Knowledge Base
+              <select
+                value={knowledgeId}
+                onChange={(event) => setKnowledgeId(event.target.value)}
+              >
+                <option value="">Tanpa dokumen</option>
+                {knowledge.map((record) => (
+                  <option key={record.id} value={record.id}>
+                    {record.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          {mode === "english" && (
+            <div className="english-ready-card">
+              <strong>Maritime English Ready</strong>
+              <span>English + Indonesian explanation</span>
+              <span>SMCP • Conversation • Grammar • Pronunciation</span>
+            </div>
+          )}
 
           <div className="ai-prompt-box">
             <strong>Contoh Perintah</strong>
@@ -325,20 +381,27 @@ export default function ProfessionalAiPage() {
             <div>
               <span className="ai-online-dot" />
               <div>
-                <strong>{activeMode.icon} {activeMode.title}</strong>
+                <strong>
+                  {activeMode.icon} {activeMode.title}
+                </strong>
                 <small>
                   {selectedKnowledge
-                    ? `Menggunakan dokumen: ${selectedKnowledge.title}`
-                    : "Terhubung ke Gemini AI"}
+                    ? `Dokumen aktif: ${selectedKnowledge.title}`
+                    : mode === "english"
+                      ? "English-first maritime learning mode"
+                      : "Terhubung ke Gemini AI"}
                 </small>
               </div>
             </div>
-            <button onClick={clearChat}>Percakapan Baru</button>
+            <button onClick={clearChat}>Chat Baru</button>
           </header>
 
           <div className="professional-messages">
             {messages.map((message) => (
-              <article className={`professional-message ${message.role}`} key={message.id}>
+              <article
+                className={`professional-message ${message.role}`}
+                key={message.id}
+              >
                 <div className="message-avatar">
                   {message.role === "assistant" ? (
                     <img src="/logo-smkpd-64.png" alt="" />
@@ -353,20 +416,30 @@ export default function ProfessionalAiPage() {
                     <p>{message.text}</p>
                   )}
                   {message.role === "assistant" && (
-                    <button className="speak-answer" onClick={() => speak(message)}>
-                      {speakingId === message.id ? "🔊 Sedang dibacakan" : "🔈 Baca jawaban"}
+                    <button
+                      className="speak-answer"
+                      onClick={() => speak(message)}
+                    >
+                      {speakingId === message.id
+                        ? "🔊 Sedang dibacakan"
+                        : mode === "english"
+                          ? "🔈 Listen"
+                          : "🔈 Baca jawaban"}
                     </button>
                   )}
                 </div>
               </article>
             ))}
+
             {loading && (
               <article className="professional-message assistant">
                 <div className="message-avatar">
                   <img src="/logo-smkpd-64.png" alt="" />
                 </div>
                 <div className="message-content ai-thinking">
-                  AI sedang menyusun jawaban terbaik...
+                  {mode === "english"
+                    ? "Preparing your Maritime English lesson..."
+                    : "AI sedang menyusun jawaban terbaik..."}
                 </div>
               </article>
             )}
@@ -377,7 +450,11 @@ export default function ProfessionalAiPage() {
             <textarea
               value={input}
               onChange={(event) => setInput(event.target.value)}
-              placeholder={`Tulis pertanyaan untuk ${activeMode.title}...`}
+              placeholder={
+                mode === "english"
+                  ? "Type your Maritime English question or sentence..."
+                  : `Tulis pertanyaan untuk ${activeMode.title}...`
+              }
               rows={3}
             />
             <div>
@@ -386,10 +463,18 @@ export default function ProfessionalAiPage() {
                 className={listening ? "voice-active" : ""}
                 onClick={startVoiceInput}
               >
-                {listening ? "🎙️ Mendengarkan..." : "🎤 Bicara"}
+                {listening
+                  ? "🎙️ Mendengarkan..."
+                  : mode === "english"
+                    ? "🎤 Speak"
+                    : "🎤 Bicara"}
               </button>
               <button type="submit" disabled={loading || !input.trim()}>
-                {loading ? "Memproses..." : "Kirim →"}
+                {loading
+                  ? "Memproses..."
+                  : mode === "english"
+                    ? "Send →"
+                    : "Kirim →"}
               </button>
             </div>
           </form>

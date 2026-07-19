@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "SMKPD AI | Smart Maritime Education Platform",
+    default: "SMKPD AI v3.1 | Smart Maritime Education Platform",
     template: "%s | SMKPD AI",
   },
   description:

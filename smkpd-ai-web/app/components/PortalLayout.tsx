@@ -60,6 +60,7 @@ export default function PortalLayout({
   const pathname = usePathname();
   const [session, setSession] = useState<Session | null>(null);
   const [ready, setReady] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const activeSession = loadSession();
@@ -77,6 +78,10 @@ export default function PortalLayout({
     setSession(activeSession);
     setReady(true);
   }, [allowedRoles, router]);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   const visibleNavigation = useMemo(
     () =>
@@ -102,12 +107,23 @@ export default function PortalLayout({
 
   return (
     <main className="suite-page">
-      <aside className="suite-sidebar">
+      <button
+        className={`suite-overlay ${menuOpen ? "show" : ""}`}
+        aria-label="Tutup menu"
+        onClick={() => setMenuOpen(false)}
+      />
+
+      <aside className={`suite-sidebar ${menuOpen ? "open" : ""}`}>
+        <div className="suite-sidebar-mobile-head">
+          <span>Menu Utama</span>
+          <button onClick={() => setMenuOpen(false)} aria-label="Tutup menu">×</button>
+        </div>
+
         <Link href="/" className="suite-brand">
           <img src="/logo-smkpd-192.png" alt="Logo SMK Pelayaran Demak" />
           <div>
             <strong>SMKPD AI</strong>
-            <span>Presentation Edition v3.0</span>
+            <span>Mobile Edition v3.1</span>
           </div>
         </Link>
 
@@ -133,6 +149,7 @@ export default function PortalLayout({
               key={item.href}
               href={item.href}
               className={pathname === item.href ? "active" : ""}
+              onClick={() => setMenuOpen(false)}
             >
               <span>{item.icon}</span>
               {item.label}
@@ -142,9 +159,9 @@ export default function PortalLayout({
 
         <div className="suite-specialists">
           <p>AI SPESIALIS</p>
-          <Link href="/ai?mode=nautika">⚓ AI Nautika</Link>
-          <Link href="/ai?mode=teknika">⚙️ AI Teknika</Link>
-          <Link href="/ai?mode=english">📚 Maritime English</Link>
+          <a href="/ai?mode=nautika">⚓ AI Nautika</a>
+          <a href="/ai?mode=teknika">⚙️ AI Teknika</a>
+          <a href="/ai?mode=english">📚 Maritime English</a>
         </div>
 
         <button className="suite-logout" onClick={logout}>
@@ -154,7 +171,14 @@ export default function PortalLayout({
 
       <section className="suite-main">
         <header className="suite-topbar">
-          <div>
+          <button
+            className="suite-menu-toggle"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Buka menu"
+          >
+            ☰
+          </button>
+          <div className="suite-topbar-title">
             <p>SMK PELAYARAN DEMAK BOARDING SCHOOL</p>
             <h1>{title}</h1>
             <span>{subtitle}</span>
