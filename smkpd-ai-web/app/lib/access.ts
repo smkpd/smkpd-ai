@@ -21,7 +21,10 @@ export type Permission =
   | "view_mcu"
   | "manage_alumni"
   | "manage_ppdb"
-  | "view_ppdb";
+  | "view_ppdb"
+  | "manage_schedule"
+  | "submit_schedule_preferences"
+  | "view_schedule";
 
 const permissions: Record<Role, Permission[]> = {
   Admin: [
@@ -46,6 +49,9 @@ const permissions: Record<Role, Permission[]> = {
     "manage_alumni",
     "manage_ppdb",
     "view_ppdb",
+    "manage_schedule",
+    "submit_schedule_preferences",
+    "view_schedule",
   ],
   "Kepala Sekolah": [
     "manage_users",
@@ -68,6 +74,27 @@ const permissions: Record<Role, Permission[]> = {
     "manage_alumni",
     "manage_ppdb",
     "view_ppdb",
+    "manage_schedule",
+    "submit_schedule_preferences",
+    "view_schedule",
+  ],
+  "Waka Kurikulum": [
+    "manage_generators",
+    "manage_library",
+    "use_simulators",
+    "manage_cbt",
+    "take_cbt",
+    "view_learning_analytics",
+    "manage_eraport",
+    "view_eraport",
+    "manage_attendance",
+    "view_attendance",
+    "view_prala",
+    "view_mcu",
+    "view_ppdb",
+    "manage_schedule",
+    "submit_schedule_preferences",
+    "view_schedule",
   ],
   Guru: [
     "manage_generators",
@@ -83,6 +110,8 @@ const permissions: Record<Role, Permission[]> = {
     "view_prala",
     "view_mcu",
     "view_ppdb",
+    "submit_schedule_preferences",
+    "view_schedule",
   ],
   Taruna: [
     "manage_library",
@@ -94,6 +123,7 @@ const permissions: Record<Role, Permission[]> = {
     "view_prala",
     "view_mcu",
     "view_ppdb",
+    "view_schedule",
   ],
   "Wali Taruna": [
     "view_eraport",
@@ -102,6 +132,7 @@ const permissions: Record<Role, Permission[]> = {
     "view_prala",
     "view_mcu",
     "view_ppdb",
+    "view_schedule",
   ],
 };
 
@@ -109,9 +140,6 @@ export function hasPermission(role: Role, permission: Permission) {
   return permissions[role]?.includes(permission) ?? false;
 }
 
-export function canAccessRole(
-  role: Role,
-  allowedRoles?: Role[]
-) {
+export function canAccessRole(role: Role, allowedRoles?: Role[]) {
   return !allowedRoles || allowedRoles.includes(role);
 }

@@ -40,6 +40,7 @@ const groups: NavGroup[] = [
       { href: "/knowledge", label: "Perpustakaan AI", icon: "📚" },
       { href: "/maritime", label: "Simulator Maritim", icon: "⚓" },
       { href: "/academic", label: "Akademik & CBT", icon: "📖" },
+      { href: "/schedule", label: "Jadwal Otomatis", icon: "🗓️", permission: "view_schedule" },
     ],
   },
   {
@@ -194,6 +195,8 @@ export default function PortalLayout({
               ? "👨‍💼"
               : session.role === "Kepala Sekolah"
                 ? "👩‍💼"
+                : session.role === "Waka Kurikulum"
+                  ? "🧑‍💼"
                 : session.role === "Guru"
                   ? "👨‍🏫"
                   : session.role === "Taruna"

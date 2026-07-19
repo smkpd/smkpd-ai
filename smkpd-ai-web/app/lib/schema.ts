@@ -1,4 +1,4 @@
-export type DataModule = "users" | "students" | "teachers" | "attendance" | "grades" | "spp" | "prala" | "mcu" | "alumni" | "ppdb" | "library" | "question_bank" | "documents";
+export type DataModule = "users" | "students" | "teachers" | "attendance" | "grades" | "spp" | "prala" | "mcu" | "alumni" | "ppdb" | "library" | "question_bank" | "schedule_classes" | "schedule_subjects" | "schedule_rooms" | "schedule_preferences" | "teaching_loads" | "schedule_entries" | "documents";
 
 export type DataSchema = {
   module: DataModule;
@@ -105,6 +105,54 @@ export const dataSchemas: Record<DataModule, DataSchema> = {
     uniqueFields: ["kode"],
     requiredFields: ["kode", "mata_pelajaran", "soal", "jawaban"],
     fields: ["kode", "mata_pelajaran", "topik", "kelas", "jenis", "soal", "opsi_a", "opsi_b", "opsi_c", "opsi_d", "opsi_e", "jawaban", "pembahasan", "tingkat_kesulitan"],
+  },
+  schedule_classes: {
+    module: "schedule_classes",
+    label: "Kelas Jadwal",
+    sheetName: "KELAS_JADWAL",
+    uniqueFields: ["kode_kelas"],
+    requiredFields: ["kode_kelas", "nama_kelas"],
+    fields: ["kode_kelas", "nama_kelas", "tingkat", "program_keahlian", "kode_ruang", "status"],
+  },
+  schedule_subjects: {
+    module: "schedule_subjects",
+    label: "Mapel Jadwal",
+    sheetName: "MAPEL_JADWAL",
+    uniqueFields: ["kode_mapel"],
+    requiredFields: ["kode_mapel", "nama_mapel"],
+    fields: ["kode_mapel", "nama_mapel", "kelompok", "warna", "status"],
+  },
+  schedule_rooms: {
+    module: "schedule_rooms",
+    label: "Ruang Jadwal",
+    sheetName: "RUANG_JADWAL",
+    uniqueFields: ["kode_ruang"],
+    requiredFields: ["kode_ruang", "nama_ruang"],
+    fields: ["kode_ruang", "nama_ruang", "jenis", "kapasitas", "status"],
+  },
+  schedule_preferences: {
+    module: "schedule_preferences",
+    label: "Preferensi Guru",
+    sheetName: "PREFERENSI_GURU",
+    uniqueFields: ["kode_guru"],
+    requiredFields: ["kode_guru", "hari_tersedia", "jp_awal", "jp_akhir"],
+    fields: ["kode_guru", "hari_tersedia", "jp_awal", "jp_akhir", "hari_prioritas", "jp_prioritas", "mapel_prioritas", "max_jp_hari", "catatan"],
+  },
+  teaching_loads: {
+    module: "teaching_loads",
+    label: "Beban Mengajar",
+    sheetName: "BEBAN_MENGAJAR",
+    uniqueFields: ["kode_beban"],
+    requiredFields: ["kode_beban", "kode_guru", "kode_mapel", "kelas", "jp_minggu"],
+    fields: ["kode_beban", "kode_guru", "kode_mapel", "kelas", "jp_minggu", "blok_jp", "hari_prioritas", "jp_prioritas", "hari_hindari", "max_jp_hari", "kode_ruang", "prioritas", "status"],
+  },
+  schedule_entries: {
+    module: "schedule_entries",
+    label: "Hasil Jadwal",
+    sheetName: "JADWAL_HASIL",
+    uniqueFields: ["id"],
+    requiredFields: ["id", "tahun_ajaran", "semester", "hari", "jp", "kode_guru", "kode_mapel", "kelas"],
+    fields: ["id", "tahun_ajaran", "semester", "hari", "jp", "waktu", "kode_guru", "nama_guru", "kode_mapel", "nama_mapel", "kelas", "kode_ruang", "status", "batch_id", "block_id", "created_at"],
   },
   documents: {
     module: "documents",

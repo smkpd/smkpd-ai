@@ -14,36 +14,177 @@ type DashboardCard = {
   accent: string;
 };
 
+const scheduleCard: DashboardCard = {
+  title: "Jadwal Otomatis",
+  description:
+    "Preferensi guru, beban mengajar, anti bentrok, serta ekspor per sekolah, guru, kelas, dan taruna.",
+  icon: "🗓️",
+  href: "/schedule",
+  accent: "blue",
+};
+
 const cardsByRole: Record<Role, DashboardCard[]> = {
   Admin: [
-    { title: "Database & Import Excel", description: "Impor data massal, backup, browser data, dan sinkronisasi cloud.", icon: "🗄️", href: "/database", accent: "blue" },
-    { title: "Pengguna & Hak Akses", description: "Tambah akun, reset password, aktif/nonaktif, dan pembagian role.", icon: "👥", href: "/users", accent: "gold" },
-    { title: "Generator Dokumen", description: "Modul, CP, ATP, LKPD, soal, dan surat resmi.", icon: "📄", href: "/generator", accent: "green" },
-    { title: "Dashboard Eksekutif", description: "Pantau data sekolah dan aktivitas AI.", icon: "📊", href: "/kepala-sekolah", accent: "purple" },
+    scheduleCard,
+    {
+      title: "Database & Import Excel",
+      description:
+        "Import data satu per satu, backup, browser data, dan sinkronisasi.",
+      icon: "🗄️",
+      href: "/database",
+      accent: "purple",
+    },
+    {
+      title: "Pengguna & Hak Akses",
+      description:
+        "Tambah akun, reset password, aktif/nonaktif, dan pembagian role.",
+      icon: "👥",
+      href: "/users",
+      accent: "gold",
+    },
+    {
+      title: "Generator Dokumen",
+      description:
+        "Modul, CP, ATP, LKPD, soal, dan surat resmi.",
+      icon: "📄",
+      href: "/generator",
+      accent: "green",
+    },
   ],
   "Kepala Sekolah": [
-    { title: "Dashboard Eksekutif", description: "Ringkasan akademik, layanan, database, dan aktivitas AI.", icon: "📊", href: "/kepala-sekolah", accent: "purple" },
-    { title: "Database & Import Excel", description: "Validasi dan impor data sekolah secara massal.", icon: "🗄️", href: "/database", accent: "blue" },
-    { title: "Pengguna & Hak Akses", description: "Menambah user dan mengatur password pengguna.", icon: "👥", href: "/users", accent: "gold" },
-    { title: "Layanan Taruna", description: "Pantau SPP, PRALA, MCU, Alumni, dan PPDB.", icon: "🏫", href: "/services", accent: "green" },
+    scheduleCard,
+    {
+      title: "Dashboard Eksekutif",
+      description:
+        "Ringkasan akademik, layanan, database, dan aktivitas AI.",
+      icon: "📊",
+      href: "/kepala-sekolah",
+      accent: "purple",
+    },
+    {
+      title: "Database & Import Excel",
+      description:
+        "Validasi dan import data sekolah secara terstruktur.",
+      icon: "🗄️",
+      href: "/database",
+      accent: "gold",
+    },
+    {
+      title: "Pengguna & Hak Akses",
+      description:
+        "Menambah user dan mengatur password pengguna.",
+      icon: "👥",
+      href: "/users",
+      accent: "green",
+    },
+  ],
+  "Waka Kurikulum": [
+    scheduleCard,
+    {
+      title: "Akademik & CBT",
+      description:
+        "Nilai, absensi, analisis belajar, dan bank soal.",
+      icon: "📖",
+      href: "/academic",
+      accent: "purple",
+    },
+    {
+      title: "Generator Dokumen",
+      description:
+        "Perangkat ajar, asesmen, dan administrasi kurikulum.",
+      icon: "📄",
+      href: "/generator",
+      accent: "gold",
+    },
+    {
+      title: "Perpustakaan AI",
+      description:
+        "PDF sekolah dan materi maritim berbasis AI.",
+      icon: "📚",
+      href: "/knowledge",
+      accent: "green",
+    },
   ],
   Guru: [
-    { title: "Generator Dokumen", description: "Buat perangkat ajar dan administrasi guru.", icon: "📄", href: "/generator", accent: "gold" },
-    { title: "Akademik & CBT", description: "Nilai, absensi, analisis belajar, dan bank soal.", icon: "📖", href: "/academic", accent: "blue" },
-    { title: "AI Pembelajaran", description: "AI umum, Nautika, Teknika, dan Maritime English.", icon: "✦", href: "/ai", accent: "purple" },
-    { title: "Perpustakaan AI", description: "PDF sekolah dan materi maritim berbasis AI.", icon: "📚", href: "/knowledge", accent: "green" },
+    scheduleCard,
+    {
+      title: "Generator Dokumen",
+      description:
+        "Buat perangkat ajar dan administrasi guru.",
+      icon: "📄",
+      href: "/generator",
+      accent: "gold",
+    },
+    {
+      title: "Akademik & CBT",
+      description:
+        "Nilai, absensi, analisis belajar, dan bank soal.",
+      icon: "📖",
+      href: "/academic",
+      accent: "purple",
+    },
+    {
+      title: "AI Pembelajaran",
+      description:
+        "AI umum, Nautika, Teknika, dan Maritime English.",
+      icon: "✦",
+      href: "/ai",
+      accent: "green",
+    },
   ],
   Taruna: [
-    { title: "AI Pembelajaran", description: "Belajar dengan AI Nautika, Teknika, dan Maritime English.", icon: "✦", href: "/ai", accent: "purple" },
-    { title: "Simulator Maritim", description: "Virtual Ship Tour, Bridge, Engine Room, dan SMCP.", icon: "⚓", href: "/maritime", accent: "blue" },
-    { title: "Akademik & CBT", description: "Latihan CBT serta melihat nilai dan absensi.", icon: "📖", href: "/academic", accent: "gold" },
-    { title: "Layanan Taruna", description: "Informasi SPP, PRALA, MCU, dan layanan sekolah.", icon: "🏫", href: "/services", accent: "green" },
+    scheduleCard,
+    {
+      title: "AI Pembelajaran",
+      description:
+        "Belajar dengan AI Nautika, Teknika, dan Maritime English.",
+      icon: "✦",
+      href: "/ai",
+      accent: "purple",
+    },
+    {
+      title: "Simulator Maritim",
+      description:
+        "Virtual Ship Tour, Bridge, Engine Room, dan SMCP.",
+      icon: "⚓",
+      href: "/maritime",
+      accent: "blue",
+    },
+    {
+      title: "Akademik & CBT",
+      description:
+        "Latihan CBT serta melihat nilai dan absensi.",
+      icon: "📖",
+      href: "/academic",
+      accent: "gold",
+    },
   ],
   "Wali Taruna": [
-    { title: "Akademik Taruna", description: "Melihat E-Raport dan absensi.", icon: "📖", href: "/academic", accent: "blue" },
-    { title: "Layanan Taruna", description: "Melihat status SPP, PRALA, dan MCU.", icon: "🏫", href: "/services", accent: "green" },
-    { title: "Perpustakaan Informasi", description: "Membaca dokumen dan informasi sekolah.", icon: "📚", href: "/knowledge", accent: "gold" },
-    { title: "AI Assistant", description: "Bantuan informasi umum sekolah.", icon: "✦", href: "/ai", accent: "purple" },
+    scheduleCard,
+    {
+      title: "Akademik Taruna",
+      description:
+        "Melihat E-Raport dan absensi.",
+      icon: "📖",
+      href: "/academic",
+      accent: "blue",
+    },
+    {
+      title: "Layanan Taruna",
+      description:
+        "Melihat status SPP, PRALA, dan MCU.",
+      icon: "🏫",
+      href: "/services",
+      accent: "green",
+    },
+    {
+      title: "Perpustakaan Informasi",
+      description:
+        "Membaca dokumen dan informasi sekolah.",
+      icon: "📚",
+      href: "/knowledge",
+      accent: "gold",
+    },
   ],
 };
 
@@ -70,8 +211,8 @@ export default function DashboardPage() {
           <p className="suite-eyebrow">SELAMAT DATANG</p>
           <h2>{session?.name}</h2>
           <p>
-            Role aktif: <strong>{session?.role}</strong>. Gunakan kartu di bawah
-            sesuai pekerjaan yang akan dilakukan.
+            Role aktif: <strong>{session?.role}</strong>. Gunakan kartu di
+            bawah sesuai pekerjaan yang akan dilakukan.
           </p>
         </div>
         <img src="/logo-smkpd-192.png" alt="" />
@@ -94,24 +235,46 @@ export default function DashboardPage() {
 
       <section className="database-summary-card">
         <div>
-          <p className="suite-eyebrow">RINGKASAN DATABASE PERANGKAT INI</p>
-          <h2>{Object.values(counts).reduce((a, b) => a + b, 0)} Rekaman</h2>
+          <p className="suite-eyebrow">
+            RINGKASAN DATABASE PERANGKAT INI
+          </p>
+          <h2>
+            {Object.values(counts).reduce((a, b) => a + b, 0)} Rekaman
+          </h2>
         </div>
         <div className="database-count-chips">
-          {Object.entries(counts).slice(0, 8).map(([module, count]) => (
-            <span key={module}>{module}: <b>{count}</b></span>
-          ))}
-          {!Object.keys(counts).length && <span>Database belum berisi data.</span>}
+          {Object.entries(counts)
+            .slice(0, 10)
+            .map(([module, count]) => (
+              <span key={module}>
+                {module}: <b>{count}</b>
+              </span>
+            ))}
+          {!Object.keys(counts).length && (
+            <span>Database belum berisi data.</span>
+          )}
         </div>
       </section>
 
       <section className="workflow-card">
-        <p className="suite-eyebrow">ALUR KERJA YANG DISARANKAN</p>
+        <p className="suite-eyebrow">ALUR PENJADWALAN</p>
         <ol>
-          <li><b>Admin/Kepala Sekolah:</b> masukkan data awal melalui Database & Excel.</li>
-          <li><b>Admin/Kepala Sekolah:</b> buat akun pengguna dan pembagian akses.</li>
-          <li><b>Guru:</b> kelola akademik, CBT, serta generator dokumen.</li>
-          <li><b>Taruna/Wali:</b> melihat data sesuai hak akses dan menggunakan layanan belajar.</li>
+          <li>
+            <b>Admin/Kepala Sekolah/Waka Kurikulum:</b> lengkapi kode guru,
+            kode mapel, kelas, dan ruang.
+          </li>
+          <li>
+            <b>Guru:</b> pilih hari, rentang jam, dan mapel yang
+            diprioritaskan.
+          </li>
+          <li>
+            <b>Waka Kurikulum:</b> lengkapi beban mengajar dan generate
+            jadwal anti bentrok.
+          </li>
+          <li>
+            <b>Semua pengguna:</b> melihat jadwal sesuai guru, kelas, atau
+            taruna dan mencetaknya.
+          </li>
         </ol>
       </section>
     </PortalLayout>

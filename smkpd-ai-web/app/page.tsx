@@ -2,6 +2,13 @@ import Link from "next/link";
 
 const functions = [
   {
+    icon: "🗓️",
+    title: "Jadwal Otomatis",
+    description:
+      "Preferensi guru, generator anti bentrok, serta cetak jadwal sekolah, guru, kelas, dan taruna.",
+    href: "/login",
+  },
+  {
     icon: "✦",
     title: "AI Pembelajaran",
     description:
@@ -55,6 +62,11 @@ const roleAccess = [
     role: "Kepala Sekolah",
     icon: "👩‍💼",
     description: "Dashboard eksekutif, validasi data, pengguna, dan monitoring sekolah.",
+  },
+  {
+    role: "Waka Kurikulum",
+    icon: "🧑‍💼",
+    description: "Mengelola struktur kurikulum, beban mengajar, preferensi, dan jadwal anti bentrok.",
   },
   {
     role: "Guru",

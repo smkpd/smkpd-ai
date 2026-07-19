@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://smkpd-ai.vercel.app"),
   title: {
     default: "SMKPD AI | Sistem Informasi dan Pembelajaran Maritim",
     template: "%s | SMKPD AI",

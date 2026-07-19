@@ -13,6 +13,7 @@ import {
 const roleOptions: Role[] = [
   "Admin",
   "Kepala Sekolah",
+  "Waka Kurikulum",
   "Guru",
   "Taruna",
   "Wali Taruna",
@@ -116,7 +117,7 @@ export default function UsersPage() {
   return (
     <PortalLayout
       title="Manajemen Pengguna"
-      subtitle="Admin dan Kepala Sekolah dapat menambah akun, mengubah password, serta mengatur status pengguna."
+      subtitle="Admin dan Kepala Sekolah dapat menambah akun termasuk Waka Kurikulum, mengubah password, serta mengatur status pengguna."
       requiredPermission="manage_users"
     >
       <section className="user-management-grid">

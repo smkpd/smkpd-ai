@@ -37,6 +37,15 @@ export const seedUsers: SchoolUser[] = [
     createdAt: "2026-07-19T00:00:00.000Z",
   },
   {
+    id: "seed-waka",
+    name: "Waka Kurikulum SMKPD",
+    username: "waka",
+    password: "waka2026",
+    role: "Waka Kurikulum",
+    isActive: true,
+    createdAt: "2026-07-20T00:00:00.000Z",
+  },
+  {
     id: "seed-guru",
     name: "Guru SMKPD",
     username: "guru",
