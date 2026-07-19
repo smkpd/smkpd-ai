@@ -4970,3 +4970,158 @@ img {
     flex-direction: column;
   }
 }
+
+
+/* ==========================================================
+   SIDEBAR DESKTOP FIX — MENU SCROLL + LOGOUT STAYS IN PANEL
+   ========================================================== */
+@media (min-width: 821px) {
+  .suite-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    padding-bottom: 14px;
+  }
+
+  .suite-sidebar .suite-brand,
+  .suite-sidebar .suite-profile,
+  .suite-sidebar .suite-logout {
+    flex: 0 0 auto;
+  }
+
+  .suite-sidebar .grouped-nav {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+    margin-right: -4px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,.2) transparent;
+  }
+
+  .suite-sidebar .grouped-nav::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .suite-sidebar .grouped-nav::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .suite-sidebar .grouped-nav::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+    background: rgba(255,255,255,.18);
+  }
+
+  .suite-sidebar .suite-logout {
+    width: 100%;
+    min-height: 44px;
+    margin-top: 10px;
+    border-color: rgba(244,197,66,.35);
+    color: #ffffff;
+    background: rgba(255,255,255,.075);
+    font-weight: 800;
+  }
+
+  .suite-sidebar .suite-logout:hover {
+    color: #07182d;
+    background: #f4c542;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 821px) {
+  .suite-sidebar {
+    padding-top: 12px;
+  }
+
+  .suite-brand {
+    padding-bottom: 11px;
+  }
+
+  .suite-profile {
+    margin: 10px 3px;
+    padding: 9px;
+  }
+
+  .suite-nav a {
+    min-height: 36px;
+    font-size: 11px;
+  }
+
+  .grouped-nav section {
+    margin-bottom: 8px;
+  }
+
+  .grouped-nav section > p {
+    margin-bottom: 3px;
+  }
+}
+
+
+/* ==========================================================
+   SHARED DOCUMENT LIBRARY + 30 MB UPLOAD
+   ========================================================== */
+.shared-library-status {
+  display: grid;
+  gap: 4px;
+  margin: 12px 0;
+  padding: 11px;
+  border: 1px solid #cfe0eb;
+  border-radius: 9px;
+  color: #285773;
+  background: #eef7fc;
+  font-size: 10px;
+}
+
+.shared-library-status strong {
+  color: #0a3558;
+}
+
+.file-limit-note {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+  color: #668095;
+  font-size: 9px;
+}
+
+.visibility-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
+  padding: 0 8px;
+  border-radius: 20px;
+  color: #1e704c;
+  background: #e6f7ee;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.upload-progress {
+  height: 9px;
+  overflow: hidden;
+  margin-top: 9px;
+  border-radius: 20px;
+  background: #e4ebf1;
+}
+
+.upload-progress > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #0b65a2, #38a9df);
+  transition: width .2s ease;
+}
+
+.pdf-upload-card.viewer {
+  min-height: auto;
+}
+
+@media (max-width: 820px) {
+  .suite-sidebar .grouped-nav {
+    min-height: auto;
+  }
+}

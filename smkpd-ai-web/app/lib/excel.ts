@@ -59,6 +59,14 @@ export async function readSingleModuleWorkbook(
   file: File,
   module: DataModule
 ) {
+  const maxFileSize = 30 * 1024 * 1024;
+
+  if (file.size > maxFileSize) {
+    throw new Error(
+      "Ukuran satu file Excel maksimal 30 MB."
+    );
+  }
+
   const XLSX = await loadSheetJs();
   const buffer = await file.arrayBuffer();
   const workbook = XLSX.read(buffer, {

@@ -96,6 +96,16 @@ export default function DatabasePage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    const maxFileSize = 30 * 1024 * 1024;
+    if (file.size > maxFileSize) {
+      setPreviewRows([]);
+      setValidationErrors([]);
+      setFileName("");
+      setNotice("Ukuran satu file Excel maksimal 30 MB.");
+      event.target.value = "";
+      return;
+    }
+
     setBusy(true);
     setNotice(`Membaca data ${importSchema.label}...`);
 
@@ -440,7 +450,7 @@ export default function DatabasePage() {
             </a>
 
             <label className="single-file-upload">
-              3. Pilih file Excel
+              3. Pilih satu file Excel (maksimal 30 MB)
               <input
                 type="file"
                 accept=".xlsx,.xls"
@@ -451,8 +461,8 @@ export default function DatabasePage() {
 
             <p>
               Isi hanya satu kategori data pada file.
-              Import berikutnya dapat dilakukan setelah
-              item ini selesai.
+              Maksimal 30 MB. Import berikutnya dapat dilakukan
+              setelah item ini selesai.
             </p>
           </article>
 

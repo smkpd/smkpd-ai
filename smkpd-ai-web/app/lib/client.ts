@@ -16,6 +16,9 @@ export type KnowledgeRecord = {
   size: number;
   createdAt: string;
   createdBy: string;
+  createdByRole?: string;
+  visibility?: "all";
+  fileUri?: string;
 };
 
 export type UsageLog = {
