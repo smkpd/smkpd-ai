@@ -5,19 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authenticate, loadUsers } from "../lib/users";
 
-const demoAccounts = [
-  { role: "Admin", username: "admin", password: "smkpd2026" },
-  { role: "Kepala Sekolah", username: "kepala", password: "kepala2026" },
-  { role: "Guru", username: "guru", password: "guru2026" },
-  { role: "Taruna", username: "taruna", password: "taruna2026" },
-  { role: "Wali Taruna", username: "wali", password: "wali2026" },
-];
-
 export default function LoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("admin");
-  const [password, setPassword] = useState("smkpd2026");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadUsers();
@@ -25,52 +18,59 @@ export default function LoginPage() {
 
   async function login(event: FormEvent) {
     event.preventDefault();
-    const account = await authenticate(username, password);
-
-    if (!account) {
-      setError("Username, password, atau status akun tidak sesuai.");
+    if (!username.trim() || !password) {
+      setError("Username dan password wajib diisi.");
       return;
     }
 
-    localStorage.setItem(
-      "smkpd_session",
-      JSON.stringify({
-        role: account.role,
-        name: account.name,
-        loginAt: new Date().toISOString(),
-      })
-    );
-    localStorage.setItem("smkpd_current_user_id", account.id);
-    router.push(
-      account.role === "Kepala Sekolah"
-        ? "/kepala-sekolah"
-        : "/dashboard"
-    );
-  }
-
-  function useDemo(usernameValue: string, passwordValue: string) {
-    setUsername(usernameValue);
-    setPassword(passwordValue);
+    setLoading(true);
     setError("");
+
+    try {
+      const account = await authenticate(username, password);
+
+      if (!account) {
+        setError("Username, password, atau status akun tidak sesuai.");
+        return;
+      }
+
+      localStorage.setItem(
+        "smkpd_session",
+        JSON.stringify({
+          role: account.role,
+          name: account.name,
+          loginAt: new Date().toISOString(),
+        })
+      );
+      localStorage.setItem("smkpd_current_user_id", account.id);
+
+      router.push(
+        account.role === "Kepala Sekolah"
+          ? "/kepala-sekolah"
+          : "/dashboard"
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <main className="login-page">
+    <main className="login-page product-login-page">
       <section className="login-shell">
         <div className="login-identity">
-          <Link href="/" className="back-home">← Kembali ke beranda</Link>
+          <Link href="/" className="back-home">← Kembali ke halaman utama</Link>
           <img src="/logo-smkpd.png" alt="Logo SMK Pelayaran Demak" />
-          <p className="login-kicker">SCHOOL SUPER APP</p>
+          <p className="login-kicker">PORTAL SISTEM TERPADU</p>
           <h1>SMKPD <span>AI</span></h1>
           <p>
-            Platform terpadu pembelajaran maritim, akademik, administrasi,
-            layanan taruna, dan monitoring kepala sekolah.
+            Akses pembelajaran maritim, akademik, administrasi, database, dan
+            layanan sekolah sesuai wewenang akun Anda.
           </p>
 
           <div className="login-benefits">
-            <div><b>⚓</b><span><strong>Maritime Learning</strong><small>AI, simulator dasar, SMCP, dan CBT</small></span></div>
-            <div><b>📊</b><span><strong>Academic System</strong><small>E-Raport, absensi, dan analisis belajar</small></span></div>
-            <div><b>🏫</b><span><strong>School Services</strong><small>SPP, PRALA, MCU, Alumni, dan PPDB</small></span></div>
+            <div><b>✦</b><span><strong>AI Pembelajaran</strong><small>Nautika, Teknika, Maritime English</small></span></div>
+            <div><b>📊</b><span><strong>Sistem Akademik</strong><small>E-Raport, absensi, analisis, dan CBT</small></span></div>
+            <div><b>🗄️</b><span><strong>Database Sekolah</strong><small>Data terstruktur dan import Excel per item</small></span></div>
           </div>
         </div>
 
@@ -80,8 +80,8 @@ export default function LoginPage() {
               <img src="/logo-smkpd-64.png" alt="" />
             </span>
             <div>
-              <p>PORTAL PENGGUNA</p>
-              <h2>Masuk ke SMKPD AI</h2>
+              <p>AKSES PENGGUNA</p>
+              <h2>Masuk ke Sistem</h2>
             </div>
           </div>
 
@@ -92,6 +92,8 @@ export default function LoginPage() {
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
                 autoComplete="username"
+                placeholder="Masukkan username"
+                autoFocus
               />
             </label>
 
@@ -102,32 +104,26 @@ export default function LoginPage() {
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 autoComplete="current-password"
+                placeholder="Masukkan password"
               />
             </label>
 
             {error && <p className="login-error">{error}</p>}
-            <button type="submit" className="login-submit">Masuk Sekarang →</button>
+            <button type="submit" className="login-submit" disabled={loading}>
+              {loading ? "Memeriksa akun..." : "Masuk Sistem →"}
+            </button>
           </form>
 
-          <div className="demo-credentials role-demo-list">
-            <strong>Akun Demo</strong>
-            {demoAccounts.map((account) => (
-              <button
-                key={account.role}
-                onClick={() => useDemo(account.username, account.password)}
-              >
-                <span>{account.role}</span>
-                <small>{account.username} / {account.password}</small>
-              </button>
-            ))}
+          <div className="login-account-help">
+            <strong>Belum memiliki akun?</strong>
+            <p>
+              Hubungi Admin atau Kepala Sekolah untuk pembuatan akun dan
+              pengaturan password.
+            </p>
           </div>
 
-          <p className="login-warning">
-            Database Edition menyimpan data lokal pada browser dan dapat
-            disinkronkan ke database cloud setelah konfigurasi.
-          </p>
           <div className="creator-credit">
-            Dibuat oleh <strong>Syaiful Bahri, M. Pd</strong><br/>
+            Dibuat oleh <strong>Syaiful Bahri, M. Pd</strong><br />
             Contact: 082335339994
           </div>
         </div>

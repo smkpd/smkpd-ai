@@ -80,7 +80,7 @@ export default function KnowledgePage() {
       setRecords(next);
       setSelectedId(record.id);
       setFile(null);
-      setNotice("PDF berhasil dimasukkan ke Knowledge Base.");
+      setNotice("PDF berhasil disimpan ke Perpustakaan AI.");
 
       const log: UsageLog = {
         id: createId(),
@@ -190,11 +190,10 @@ Jawab secara jelas. Bila informasi tidak tersedia dalam dokumen, katakan bahwa i
               <p className="suite-eyebrow">UPLOAD DOKUMEN</p>
               <h2>Masukkan PDF Sekolah</h2>
               <p>
-                PDF akan dianalisis oleh AI dan disimpan sebagai Knowledge Base
-                pada browser ini.
+                Unggah satu PDF pada setiap proses. Dokumen akan dianalisis oleh AI dan disimpan ke Perpustakaan AI pada perangkat ini.
               </p>
               <label>
-                Pilih PDF maksimal 4 MB
+                Pilih satu PDF maksimal 4 MB
                 <input
                   type="file"
                   accept="application/pdf,.pdf"

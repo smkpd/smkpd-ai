@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     const maxSize = 4 * 1024 * 1024;
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: "Ukuran PDF maksimal 4 MB untuk versi presentasi." },
+        { error: "Ukuran satu dokumen PDF maksimal 4 MB." },
         { status: 400 }
       );
     }

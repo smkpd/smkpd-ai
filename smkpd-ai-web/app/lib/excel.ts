@@ -1,4 +1,8 @@
-import { DataModule, dataSchemas, normalizeRow, sheetToModule } from "./schema";
+import {
+  DataModule,
+  dataSchemas,
+  normalizeRow,
+} from "./schema";
 
 declare global {
   interface Window {
@@ -18,6 +22,10 @@ export async function loadSheetJs() {
     );
 
     if (existing) {
+      if (window.XLSX) {
+        resolve();
+        return;
+      }
       existing.addEventListener("load", () => resolve(), { once: true });
       existing.addEventListener(
         "error",
@@ -41,18 +49,16 @@ export async function loadSheetJs() {
   });
 
   if (!window.XLSX) {
-    throw new Error("SheetJS belum tersedia.");
+    throw new Error("Library Excel belum tersedia.");
   }
 
   return window.XLSX;
 }
 
-function normalizeExcelValue(value: unknown) {
-  if (value instanceof Date) return value.toISOString().slice(0, 10);
-  return value;
-}
-
-export async function readDatabaseWorkbook(file: File) {
+export async function readSingleModuleWorkbook(
+  file: File,
+  module: DataModule
+) {
   const XLSX = await loadSheetJs();
   const buffer = await file.arrayBuffer();
   const workbook = XLSX.read(buffer, {
@@ -60,40 +66,49 @@ export async function readDatabaseWorkbook(file: File) {
     cellDates: true,
   });
 
-  const result: Partial<Record<DataModule, Record<string, unknown>[]>> = {};
-  const ignoredSheets: string[] = [];
+  const schema = dataSchemas[module];
+  const preferredNames = [
+    "DATA",
+    schema.sheetName,
+    schema.sheetName.toUpperCase(),
+  ];
 
-  workbook.SheetNames.forEach((sheetName: string) => {
-    const module = sheetToModule[sheetName.trim().toUpperCase()];
-    if (!module) {
-      if (!["PETUNJUK", "KREDIT"].includes(sheetName.toUpperCase())) {
-        ignoredSheets.push(sheetName);
-      }
-      return;
-    }
+  const selectedSheetName =
+    preferredNames.find((name) => workbook.SheetNames.includes(name)) ||
+    workbook.SheetNames.find(
+      (name: string) =>
+        !["PETUNJUK", "KREDIT"].includes(name.trim().toUpperCase())
+    );
 
-    const rawRows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+  if (!selectedSheetName) {
+    throw new Error("File tidak memiliki sheet data yang dapat dibaca.");
+  }
+
+  const rawRows = XLSX.utils.sheet_to_json(
+    workbook.Sheets[selectedSheetName],
+    {
       defval: "",
       raw: false,
       dateNF: "yyyy-mm-dd",
-    }) as Record<string, unknown>[];
+    }
+  ) as Record<string, unknown>[];
 
-    result[module] = rawRows
-      .map((row) => {
-        const normalized = normalizeRow(row, dataSchemas[module]);
-        Object.entries(normalized).forEach(([key, value]) => {
-          normalized[key] = normalizeExcelValue(value);
-        });
-        return normalized;
-      })
-      .filter((row) =>
-        Object.values(row).some(
-          (value) => value !== undefined && value !== null && String(value).trim()
-        )
-      );
-  });
+  const rows = rawRows
+    .map((row) => normalizeRow(row, schema))
+    .filter((row) =>
+      Object.values(row).some(
+        (value) =>
+          value !== undefined &&
+          value !== null &&
+          String(value).trim() !== ""
+      )
+    );
 
-  return { modules: result, ignoredSheets };
+  return {
+    module,
+    sheetName: selectedSheetName,
+    rows,
+  };
 }
 
 export async function exportDatabaseWorkbook(
@@ -105,6 +120,7 @@ export async function exportDatabaseWorkbook(
   Object.entries(snapshot).forEach(([module, rows]) => {
     const schema = dataSchemas[module as DataModule];
     if (!schema) return;
+
     const orderedRows = rows.map((row) => {
       const ordered: Record<string, unknown> = {};
       schema.fields.forEach((field) => {
@@ -112,14 +128,21 @@ export async function exportDatabaseWorkbook(
       });
       return ordered;
     });
+
     const sheet = XLSX.utils.json_to_sheet(orderedRows, {
       header: schema.fields,
     });
-    XLSX.utils.book_append_sheet(workbook, sheet, schema.sheetName);
+    XLSX.utils.book_append_sheet(
+      workbook,
+      sheet,
+      schema.sheetName
+    );
   });
 
   XLSX.writeFile(
     workbook,
-    `SMKPD_DATABASE_BACKUP_${new Date().toISOString().slice(0, 10)}.xlsx`
+    `SMKPD_DATABASE_BACKUP_${new Date()
+      .toISOString()
+      .slice(0, 10)}.xlsx`
   );
 }

@@ -3,11 +3,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "SMKPD AI v3.1 | Smart Maritime Education Platform",
+    default: "SMKPD AI | Sistem Informasi dan Pembelajaran Maritim",
     template: "%s | SMKPD AI",
   },
   description:
-    "Platform AI resmi pembelajaran maritim SMK Pelayaran Demak Boarding School.",
+    "Sistem terpadu pembelajaran maritim, akademik, administrasi, database, dan layanan SMK Pelayaran Demak Boarding School.",
   applicationName: "SMKPD AI",
   manifest: "/manifest.webmanifest",
   icons: {

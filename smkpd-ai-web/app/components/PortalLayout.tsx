@@ -184,7 +184,7 @@ export default function PortalLayout({
           <img src="/logo-smkpd-192.png" alt="Logo SMKPD" />
           <div>
             <strong>SMKPD AI</strong>
-            <span>Database Edition v5.0</span>
+            <span>Sistem Terpadu Sekolah</span>
           </div>
         </Link>
 
@@ -250,7 +250,7 @@ export default function PortalLayout({
         <div className="suite-body">{children}</div>
 
         <footer className="system-credit">
-          <span>SMKPD AI Database Edition v5.0</span>
+          <span>SMKPD AI</span>
           <strong>Dibuat oleh Syaiful Bahri, M. Pd</strong>
           <span>Contact: 082335339994</span>
         </footer>

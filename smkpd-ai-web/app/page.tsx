@@ -1,298 +1,241 @@
-"use client";
-
-import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import RichText from "./components/RichText";
 
-type ChatMessage = { role: "user" | "assistant"; text: string };
-type Mode = "umum" | "english" | "nautika" | "teknika" | "soal" | "surat";
+const functions = [
+  {
+    icon: "✦",
+    title: "AI Pembelajaran",
+    description:
+      "Asisten umum, AI Nautika, AI Teknika, dan Maritime English untuk kegiatan belajar.",
+    href: "/login",
+  },
+  {
+    icon: "📚",
+    title: "Perpustakaan AI",
+    description:
+      "Kelola PDF dan materi maritim, lalu tanyakan isi dokumen kepada AI.",
+    href: "/login",
+  },
+  {
+    icon: "📖",
+    title: "Akademik & CBT",
+    description:
+      "E-Raport, absensi, analisis hasil belajar, dan bank soal terintegrasi.",
+    href: "/login",
+  },
+  {
+    icon: "⚓",
+    title: "Simulator Maritim",
+    description:
+      "Virtual Ship Tour, Bridge Simulator, Engine Room, dan latihan SMCP.",
+    href: "/login",
+  },
+  {
+    icon: "🏫",
+    title: "Layanan Taruna",
+    description:
+      "Pembayaran SPP, PRALA, MCU, Alumni, dan PPDB dalam satu alur.",
+    href: "/login",
+  },
+  {
+    icon: "🗄️",
+    title: "Database & Excel",
+    description:
+      "Database terstruktur dengan impor satu jenis data per proses dan backup Excel.",
+    href: "/login",
+  },
+];
 
-const modes: { id: Mode; icon: string; title: string; subtitle: string; example: string }[] = [
-  { id: "umum", icon: "/logo-smkpd-64.png", title: "AI Assistant", subtitle: "Asisten sekolah serbaguna", example: "Jelaskan fungsi SMKPD AI secara singkat." },
-  { id: "english", icon: "📚", title: "Maritime English", subtitle: "Latihan komunikasi maritim", example: "Buat percakapan singkat antara captain dan cadet saat handover jaga." },
-  { id: "nautika", icon: "⚓", title: "AI Nautika", subtitle: "Navigasi, COLREG, deck", example: "Jelaskan COLREG Rule 13 dengan bahasa sederhana." },
-  { id: "teknika", icon: "⚙️", title: "AI Teknika", subtitle: "Mesin dan sistem kapal", example: "Jelaskan sistem pendingin main engine kapal." },
-  { id: "soal", icon: "📝", title: "Generator Soal", subtitle: "Buat soal dan kunci", example: "Buat 10 soal pilihan ganda tentang alat keselamatan kapal beserta kunci." },
-  { id: "surat", icon: "📄", title: "Generator Surat", subtitle: "Surat resmi sekolah", example: "Buat surat undangan rapat wali taruna yang resmi." },
+const roleAccess = [
+  {
+    role: "Admin",
+    icon: "👨‍💼",
+    description: "Pengaturan sistem, database, pengguna, dokumen, dan seluruh layanan.",
+  },
+  {
+    role: "Kepala Sekolah",
+    icon: "👩‍💼",
+    description: "Dashboard eksekutif, validasi data, pengguna, dan monitoring sekolah.",
+  },
+  {
+    role: "Guru",
+    icon: "👨‍🏫",
+    description: "Perangkat ajar, akademik, CBT, AI, perpustakaan, dan absensi.",
+  },
+  {
+    role: "Taruna & Wali",
+    icon: "👨‍🎓",
+    description: "Akses belajar dan informasi akademik atau layanan sesuai kewenangan.",
+  },
 ];
 
 export default function Home() {
-  const [mode, setMode] = useState<Mode>("umum");
-  const [role, setRole] = useState("Guru");
-  const [language, setLanguage] = useState<"id" | "en">("id");
-  const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      role: "assistant",
-      text: "Selamat datang di SMKPD AI. Pilih layanan, lalu tuliskan pertanyaan Anda. Saya siap membantu kebutuhan pembelajaran dan administrasi maritim.",
-    },
-  ]);
-  const [loading, setLoading] = useState(false);
-  const [speaking, setSpeaking] = useState(false);
-  const endRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
-
-  const active = modes.find((item) => item.id === mode)!;
-
-  async function submit(e?: FormEvent) {
-    e?.preventDefault();
-    const message = input.trim();
-    if (!message || loading) return;
-
-    const nextMessages: ChatMessage[] = [...messages, { role: "user", text: message }];
-    setMessages(nextMessages);
-    setInput("");
-    setLoading(true);
-
-    try {
-      const requestMessage =
-        mode === "english"
-          ? `${message}\n\nUse Maritime English first, then provide concise Indonesian translation, correction, practice response, and pronunciation guidance when relevant.`
-          : message;
-
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mode,
-          role,
-          language,
-          message: requestMessage,
-          history: nextMessages.slice(-8),
-        }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "AI belum dapat merespons.");
-
-      setMessages((prev) => [...prev, { role: "assistant", text: data.text }]);
-    } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          text: error instanceof Error
-            ? `Terjadi kendala: ${error.message}`
-            : "Terjadi kendala saat menghubungi AI.",
-        },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function startVoiceInput() {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      alert("Fitur mikrofon belum didukung browser ini. Gunakan Google Chrome atau Microsoft Edge.");
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = language === "id" ? "id-ID" : "en-US";
-    recognition.interimResults = false;
-    recognition.onresult = (event: any) => setInput(event.results[0][0].transcript);
-    recognition.onerror = () => alert("Suara belum terbaca. Silakan coba lagi.");
-    recognition.start();
-  }
-
-  function speakLastAnswer() {
-    const last = [...messages].reverse().find((item) => item.role === "assistant");
-    if (!last || !("speechSynthesis" in window)) return;
-
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(last.text);
-    utterance.lang = language === "id" ? "id-ID" : "en-US";
-    utterance.onstart = () => setSpeaking(true);
-    utterance.onend = () => setSpeaking(false);
-    utterance.onerror = () => setSpeaking(false);
-    window.speechSynthesis.speak(utterance);
-  }
-
   return (
-    <main>
-      <header className="navbar">
-        <div className="brand">
+    <main className="product-landing">
+      <header className="product-nav">
+        <Link href="/" className="product-brand">
           <img src="/logo-smkpd.png" alt="Logo SMK Pelayaran Demak" />
           <div>
             <strong>SMKPD AI</strong>
-            <span>Smart Maritime Education Platform</span>
+            <span>Sistem Informasi dan Pembelajaran Maritim</span>
           </div>
-        </div>
+        </Link>
 
-        <div className="nav-actions">
-          <Link className="dashboard-link" href="/login">Masuk Portal v3</Link>
-          <select aria-label="Peran pengguna" value={role} onChange={(e) => setRole(e.target.value)}>
-            <option>Admin</option>
-            <option>Guru</option>
-            <option>Taruna</option>
-            <option>Wali Taruna</option>
-          </select>
-          <button className="language" onClick={() => setLanguage(language === "id" ? "en" : "id")}>
-            {language === "id" ? "ID 🇮🇩" : "EN 🇬🇧"}
-          </button>
-        </div>
+        <nav>
+          <a href="#fungsi">Fungsi</a>
+          <a href="#alur">Alur</a>
+          <a href="#akses">Akses</a>
+          <Link href="/login" className="product-login-button">
+            Masuk Sistem
+          </Link>
+        </nav>
       </header>
 
-      <section className="hero">
-        <div className="hero-copy">
-          <p className="eyebrow">SMK PELAYARAN DEMAK BOARDING SCHOOL</p>
-          <h1>
-            Belajar maritim lebih cepat dengan <span>Artificial Intelligence</span>
-          </h1>
-          <p className="hero-description">
-            Satu platform untuk Maritime English, Nautika, Teknika, pembuatan soal,
-            surat resmi, dan pendamping belajar taruna.
+      <section className="product-hero">
+        <div className="product-hero-copy">
+          <p className="product-kicker">
+            SMK PELAYARAN DEMAK BOARDING SCHOOL
           </p>
-          <div className="hero-buttons">
-            <a href="#assistant" className="primary-btn">Mulai Gunakan AI</a>
-            <Link href="/presentasi" className="secondary-btn">Lihat Semua Fitur</Link>
-            <span className="status"><i /> Sistem demo aktif</span>
+          <h1>
+            Satu sistem untuk pembelajaran, akademik, administrasi, dan layanan
+            sekolah.
+          </h1>
+          <p>
+            SMKPD AI menghubungkan kecerdasan buatan maritim, pengelolaan data,
+            perangkat ajar, layanan taruna, dan monitoring sekolah dalam alur
+            kerja yang terstruktur.
+          </p>
+          <div className="product-hero-actions">
+            <Link href="/login" className="product-primary-button">
+              Masuk ke Sistem
+            </Link>
+            <a href="#fungsi" className="product-secondary-button">
+              Pelajari Fungsi
+            </a>
           </div>
-          <div className="stats">
-            <div><strong>20+</strong><span>Layanan AI</span></div>
-            <div><strong>4</strong><span>Peran pengguna</span></div>
-            <div><strong>2</strong><span>Bahasa</span></div>
+          <div className="product-trust-row">
+            <span>✓ Akses berbasis peran</span>
+            <span>✓ Database terstruktur</span>
+            <span>✓ Import data per jenis</span>
           </div>
         </div>
 
-        <div className="hero-card">
-          <div className="radar">
-            <div className="radar-line" />
-            <div className="radar-dot dot-one" />
-            <div className="radar-dot dot-two" />
-            <div className="radar-dot dot-three" />
-            <img src="/logo-smkpd.png" alt="" />
+        <div className="product-command-card">
+          <div className="product-command-head">
+            <img src="/logo-smkpd-192.png" alt="" />
+            <div>
+              <small>PLATFORM TERPADU</small>
+              <strong>Maritime School System</strong>
+            </div>
           </div>
-          <h2>Maritime Intelligence Center</h2>
-          <p>Teknologi pembelajaran untuk generasi maritim religius, disiplin, tangguh, profesional, dan berkarakter.</p>
+          <div className="product-command-list">
+            <div><span>✦</span><b>AI Maritim</b><small>Pembelajaran dan dokumen</small></div>
+            <div><span>📊</span><b>Akademik</b><small>Nilai, absensi, dan CBT</small></div>
+            <div><span>🗄️</span><b>Database</b><small>Excel dan data sekolah</small></div>
+            <div><span>🏫</span><b>Layanan</b><small>SPP, PRALA, MCU, Alumni, PPDB</small></div>
+          </div>
+          <div className="product-system-status">
+            <i />
+            Sistem siap digunakan
+          </div>
         </div>
       </section>
 
-      <section className="feature-section">
-        <div className="section-heading">
-          <p>LAYANAN UTAMA</p>
-          <h2>Pilih kebutuhan Anda</h2>
+      <section className="product-function-section" id="fungsi">
+        <div className="product-section-heading">
+          <p>FUNGSI UTAMA</p>
+          <h2>Setiap pekerjaan berada pada menu yang tepat</h2>
+          <span>
+            Tidak ada menu berulang. Pengguna masuk ke sistem dan hanya melihat
+            fungsi sesuai role.
+          </span>
         </div>
-        <div className="feature-grid">
-          {modes.map((item) => (
-            <button
-              key={item.id}
-              className={`feature-card ${mode === item.id ? "active" : ""}`}
-              onClick={() => {
-                setMode(item.id);
-                if (item.id === "english") setLanguage("en");
-                document.getElementById("assistant")?.scrollIntoView({ behavior: "smooth" });
-              }}
-            >
-              <span className={`feature-icon ${item.icon.startsWith("/") ? "service-logo-icon" : ""}`}>
-                {item.icon.startsWith("/") ? <img src={item.icon} alt="" /> : item.icon}
-              </span>
-              <strong>{item.title}</strong>
-              <small>{item.subtitle}</small>
-              <span className="feature-arrow">→</span>
-            </button>
+
+        <div className="product-function-grid">
+          {functions.map((item) => (
+            <Link href={item.href} key={item.title}>
+              <span>{item.icon}</span>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+              <strong>Buka melalui portal →</strong>
+            </Link>
           ))}
         </div>
       </section>
 
-      <section className="assistant-section" id="assistant">
-        <aside className="assistant-sidebar">
-          <p className="eyebrow">MODE AKTIF</p>
-          <div className="active-mode">
-            <span className={active.icon.startsWith("/") ? "service-logo-icon" : ""}>
-              {active.icon.startsWith("/") ? <img src={active.icon} alt="" /> : active.icon}
-            </span>
-            <div>
-              <strong>{active.title}</strong>
-              <small>{active.subtitle}</small>
-            </div>
-          </div>
-          <p className="sidebar-label">Contoh perintah</p>
-          <button className="example-button" onClick={() => setInput(active.example)}>
-            “{active.example}”
-          </button>
-          <a
-            className="open-full-mode"
-            href={active.id === "umum" ? "/ai" : `/ai?mode=${active.id}`}
-          >
-            Buka {active.title} versi penuh →
-          </a>
-          <div className="demo-note">
-            <strong>Mode Demo</strong>
-            <p>School Super App menyediakan AI maritim, simulator dasar, CBT, E-Raport, Absensi, SPP, PRALA, MCU, Alumni, PPDB, dan monitoring sekolah.</p>
-          </div>
-        </aside>
+      <section className="product-workflow-section" id="alur">
+        <div className="product-section-heading">
+          <p>ALUR OPERASIONAL</p>
+          <h2>Data dikerjakan secara bertahap dan mudah diperiksa</h2>
+        </div>
 
-        <div className="chat-panel">
-          <div className="chat-header">
-            <div>
-              <span className="online-dot" />
-              <strong>SMKPD AI Assistant</strong>
-              <small>Siap melayani sebagai {role}</small>
-            </div>
-            <button className="voice-output" onClick={speakLastAnswer}>
-              {speaking ? "🔊 Berbicara..." : "🔈 Baca Jawaban"}
-            </button>
-          </div>
-
-          <div className="messages">
-            {messages.map((item, index) => (
-              <div key={index} className={`message ${item.role}`}>
-                <span className="avatar">{item.role === "assistant" ? "⚓" : "👤"}</span>
-                <div>
-                  {item.role === "assistant" ? (
-                    <RichText text={item.text} />
-                  ) : (
-                    item.text
-                  )}
-                </div>
-              </div>
-            ))}
-            {loading && (
-              <div className="message assistant">
-                <span className="avatar">⚓</span>
-                <div className="typing"><i /><i /><i /></div>
-              </div>
-            )}
-            <div ref={endRef} />
-          </div>
-
-          <form className="chat-form" onSubmit={submit}>
-            <button type="button" className="mic-button" onClick={startVoiceInput} title="Masukkan suara">🎙️</button>
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  submit();
-                }
-              }}
-              placeholder={`Tulis pertanyaan untuk ${active.title}...`}
-              rows={1}
-            />
-            <button className="send-button" disabled={loading || !input.trim()}>
-              Kirim ➜
-            </button>
-          </form>
-          <p className="disclaimer">AI dapat membuat kekeliruan. Verifikasi materi penting dengan guru atau sumber resmi.</p>
+        <div className="product-workflow-grid">
+          <article>
+            <span>1</span>
+            <h3>Siapkan Data</h3>
+            <p>Pilih satu jenis data, misalnya Taruna, Nilai, SPP, atau PPDB.</p>
+          </article>
+          <article>
+            <span>2</span>
+            <h3>Gunakan Template</h3>
+            <p>Unduh template khusus untuk item tersebut dan lengkapi datanya.</p>
+          </article>
+          <article>
+            <span>3</span>
+            <h3>Validasi dan Import</h3>
+            <p>Unggah satu file, periksa kesalahan, lalu simpan ke database.</p>
+          </article>
+          <article>
+            <span>4</span>
+            <h3>Gunakan Data</h3>
+            <p>Data tersedia pada modul akademik, layanan, pengguna, atau laporan.</p>
+          </article>
         </div>
       </section>
 
-      <footer>
-        <img src="/logo-smkpd.png" alt="" />
-        <div>
-          <strong>SMKPD AI</strong>
-          <p>SMK Pelayaran Demak Boarding School</p>
+      <section className="product-access-section" id="akses">
+        <div className="product-section-heading">
+          <p>HAK AKSES</p>
+          <h2>Tampilan dan wewenang menyesuaikan pengguna</h2>
         </div>
-        <span>© 2026 • Database Edition v5.0</span>
-        <div className="home-credit">Dibuat oleh <strong>Syaiful Bahri, M. Pd</strong> • Contact: 082335339994</div>
+
+        <div className="product-access-grid">
+          {roleAccess.map((item) => (
+            <article key={item.role}>
+              <span>{item.icon}</span>
+              <div>
+                <h3>{item.role}</h3>
+                <p>{item.description}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="product-cta">
+        <img src="/logo-smkpd-192.png" alt="" />
+        <div>
+          <p>PORTAL RESMI SMKPD AI</p>
+          <h2>Masuk menggunakan akun yang diberikan pengelola sistem.</h2>
+          <span>
+            Username dan password dikelola oleh Admin atau Kepala Sekolah.
+          </span>
+        </div>
+        <Link href="/login">Masuk Sistem →</Link>
+      </section>
+
+      <footer className="product-footer">
+        <div className="product-footer-brand">
+          <img src="/logo-smkpd.png" alt="" />
+          <div>
+            <strong>SMKPD AI</strong>
+            <span>SMK Pelayaran Demak Boarding School</span>
+          </div>
+        </div>
+        <div className="product-footer-credit">
+          Dibuat oleh <strong>Syaiful Bahri, M. Pd</strong>
+          <span>Contact: 082335339994</span>
+        </div>
+        <span>© 2026 SMK Pelayaran Demak Boarding School</span>
       </footer>
     </main>
   );
