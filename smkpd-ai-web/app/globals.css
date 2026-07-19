@@ -915,3 +915,196 @@ footer p { margin: 3px 0 0; font-size: 12px; }
     padding: 8px;
   }
 }
+
+
+/* ==================================
+   SMKPD AI V2.3 DOCUMENT ARCHIVE
+   ================================== */
+.document-archive {
+  margin-top: 22px;
+  padding: 24px;
+  border: 1px solid #dbe4ed;
+  border-radius: 18px;
+  background: white;
+}
+.archive-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+.archive-header p {
+  margin: 0 0 5px;
+  color: #5d7590;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .17em;
+}
+.archive-header h2 {
+  margin: 0;
+  color: #081d35;
+}
+.archive-header span {
+  display: block;
+  margin-top: 6px;
+  color: #71859a;
+  font-size: 12px;
+}
+.archive-header > button {
+  min-height: 39px;
+  padding: 0 13px;
+  border: 1px solid #e0b5b5;
+  border-radius: 9px;
+  color: #9d2e2e;
+  cursor: pointer;
+  background: #fff4f4;
+}
+.archive-header > button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+.archive-controls {
+  display: grid;
+  grid-template-columns: 1fr 250px;
+  gap: 13px;
+  margin: 20px 0 16px;
+}
+.archive-controls label {
+  display: grid;
+  gap: 7px;
+  color: #173551;
+  font-size: 12px;
+  font-weight: 800;
+}
+.archive-controls input,
+.archive-controls select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d2dee9;
+  border-radius: 10px;
+  outline: none;
+  color: #10243b;
+  background: #fbfdff;
+}
+.archive-controls input:focus,
+.archive-controls select:focus {
+  border-color: #0d6cba;
+  box-shadow: 0 0 0 4px rgba(13,108,186,.08);
+}
+.archive-list {
+  display: grid;
+  gap: 9px;
+}
+.archive-list article {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 13px;
+  padding: 14px;
+  border: 1px solid #dce5ee;
+  border-radius: 12px;
+  background: #fbfdff;
+}
+.archive-list article:hover,
+.archive-list article.selected {
+  border-color: #dfb32a;
+  background: #fffaf0;
+}
+.archive-icon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  font-size: 22px;
+  background: #eaf2f9;
+}
+.archive-info {
+  min-width: 0;
+}
+.archive-info h3 {
+  margin: 5px 0 4px;
+  overflow: hidden;
+  color: #0a2b4b;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.archive-info p {
+  margin: 0;
+  overflow: hidden;
+  color: #75889b;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.archive-meta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #71869a;
+  font-size: 10px;
+}
+.archive-meta span {
+  padding: 3px 7px;
+  border-radius: 20px;
+  color: #0b4b80;
+  font-weight: 800;
+  background: #e6f2fc;
+}
+.archive-actions {
+  display: flex;
+  gap: 7px;
+}
+.archive-actions button {
+  min-height: 36px;
+  padding: 0 11px;
+  border: 1px solid #cbd9e5;
+  border-radius: 8px;
+  color: #173d60;
+  cursor: pointer;
+  background: white;
+}
+.archive-actions button.danger {
+  color: #a22e2e;
+  border-color: #ecc9c9;
+  background: #fff5f5;
+}
+.archive-empty {
+  min-height: 210px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  text-align: center;
+  color: #74889b;
+  border: 1px dashed #ccd9e4;
+  border-radius: 12px;
+  background: #f9fbfd;
+}
+.archive-empty > span {
+  font-size: 42px;
+}
+.archive-empty h3 {
+  margin: 9px 0 4px;
+  color: #294a68;
+}
+.archive-empty p {
+  margin: 0;
+  font-size: 12px;
+}
+@media (max-width: 720px) {
+  .archive-header {
+    flex-direction: column;
+  }
+  .archive-controls {
+    grid-template-columns: 1fr;
+  }
+  .archive-list article {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+  .archive-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}

@@ -8,6 +8,20 @@ type Role = "Admin" | "Guru" | "Taruna" | "Wali Taruna";
 type Session = { role: Role; name: string; loginAt: string };
 type ToolId = "modul" | "cp" | "atp" | "lkpd" | "soal" | "surat";
 
+type DocumentRecord = {
+  id: string;
+  tool: ToolId;
+  toolTitle: string;
+  title: string;
+  mapel: string;
+  kelas: string;
+  semester: string;
+  language: string;
+  outputFormat: string;
+  content: string;
+  createdAt: string;
+};
+
 const tools: Array<{
   id: ToolId;
   icon: string;
@@ -224,6 +238,32 @@ function documentToPlainText(value: string) {
   return output.join("\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
+function loadDocuments(): DocumentRecord[] {
+  if (typeof window === "undefined") return [];
+
+  try {
+    const parsed = JSON.parse(localStorage.getItem("smkpd_documents") || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveDocuments(documents: DocumentRecord[]) {
+  localStorage.setItem("smkpd_documents", JSON.stringify(documents.slice(0, 100)));
+}
+
+function formatDocumentDate(value: string) {
+  try {
+    return new Intl.DateTimeFormat("id-ID", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(new Date(value));
+  } catch {
+    return value;
+  }
+}
+
 function buildPrompt(
   tool: ToolId,
   data: {
@@ -298,6 +338,10 @@ export default function DashboardPage() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [activityCount, setActivityCount] = useState(0);
+  const [documents, setDocuments] = useState<DocumentRecord[]>([]);
+  const [documentSearch, setDocumentSearch] = useState("");
+  const [documentFilter, setDocumentFilter] = useState<"all" | ToolId>("all");
+  const [selectedDocumentId, setSelectedDocumentId] = useState("");
   const [notice, setNotice] = useState("");
 
   useEffect(() => {
@@ -311,6 +355,7 @@ export default function DashboardPage() {
       setSession(JSON.parse(raw));
       const activities = JSON.parse(localStorage.getItem("smkpd_activities") || "[]");
       setActivityCount(Array.isArray(activities) ? activities.length : 0);
+      setDocuments(loadDocuments());
     } catch {
       localStorage.removeItem("smkpd_session");
       router.replace("/login");
@@ -321,6 +366,21 @@ export default function DashboardPage() {
     () => tools.find((item) => item.id === tool) || tools[0],
     [tool]
   );
+
+  const filteredDocuments = useMemo(() => {
+    const keyword = documentSearch.trim().toLowerCase();
+
+    return documents.filter((document) => {
+      const matchesFilter = documentFilter === "all" || document.tool === documentFilter;
+      const matchesKeyword =
+        !keyword ||
+        document.title.toLowerCase().includes(keyword) ||
+        document.mapel.toLowerCase().includes(keyword) ||
+        document.toolTitle.toLowerCase().includes(keyword);
+
+      return matchesFilter && matchesKeyword;
+    });
+  }, [documents, documentFilter, documentSearch]);
 
   async function generate(event: FormEvent) {
     event.preventDefault();
@@ -360,16 +420,41 @@ export default function DashboardPage() {
       const output = normalizeAiOutput(String(data.text || ""));
       setResult(output);
 
+      const now = new Date().toISOString();
+      const documentId =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+      const documentRecord: DocumentRecord = {
+        id: documentId,
+        tool,
+        toolTitle: activeTool.title,
+        title: topik,
+        mapel,
+        kelas,
+        semester,
+        language,
+        outputFormat,
+        content: output,
+        createdAt: now,
+      };
+
+      const nextDocuments = [documentRecord, ...loadDocuments()].slice(0, 100);
+      saveDocuments(nextDocuments);
+      setDocuments(nextDocuments);
+      setSelectedDocumentId(documentId);
+
       const activity = {
         tool: activeTool.title,
         title: topik,
-        at: new Date().toISOString(),
+        at: now,
       };
       const previous = JSON.parse(localStorage.getItem("smkpd_activities") || "[]");
       const next = [activity, ...(Array.isArray(previous) ? previous : [])].slice(0, 30);
       localStorage.setItem("smkpd_activities", JSON.stringify(next));
-      setActivityCount(next.length);
-      setNotice("Dokumen berhasil dibuat oleh SMKPD AI.");
+      setActivityCount(nextDocuments.length);
+      setNotice("Dokumen berhasil dibuat dan otomatis tersimpan di Arsip Dokumen.");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Terjadi kendala.");
     } finally {
@@ -467,6 +552,63 @@ export default function DashboardPage() {
     printWindow.document.close();
   }
 
+  function openDocument(document: DocumentRecord) {
+    setTool(document.tool);
+    setMapel(document.mapel);
+    setKelas(document.kelas);
+    setSemester(document.semester);
+    setLanguage(document.language);
+    setOutputFormat(document.outputFormat);
+    setTopik(document.title);
+    setResult(document.content);
+    setSelectedDocumentId(document.id);
+    setNotice(`Dokumen "${document.title}" berhasil dibuka kembali.`);
+    window.scrollTo({ top: document.documentElement.scrollHeight * 0.45, behavior: "smooth" });
+  }
+
+  function deleteDocument(documentId: string) {
+    const document = documents.find((item) => item.id === documentId);
+    if (!document) return;
+
+    const confirmed = window.confirm(
+      `Hapus dokumen "${document.title}" dari arsip? Tindakan ini tidak dapat dibatalkan.`
+    );
+    if (!confirmed) return;
+
+    const nextDocuments = documents.filter((item) => item.id !== documentId);
+    saveDocuments(nextDocuments);
+    setDocuments(nextDocuments);
+    setActivityCount(nextDocuments.length);
+
+    if (selectedDocumentId === documentId) {
+      setSelectedDocumentId("");
+    }
+
+    setNotice("Dokumen berhasil dihapus dari arsip.");
+  }
+
+  function clearArchive() {
+    if (documents.length === 0) return;
+
+    const confirmed = window.confirm(
+      "Hapus seluruh arsip dokumen di perangkat ini? Tindakan ini tidak dapat dibatalkan."
+    );
+    if (!confirmed) return;
+
+    saveDocuments([]);
+    setDocuments([]);
+    setActivityCount(0);
+    setSelectedDocumentId("");
+    setNotice("Seluruh arsip dokumen berhasil dikosongkan.");
+  }
+
+  function startNewDocument() {
+    setResult("");
+    setSelectedDocumentId("");
+    setNotice("Formulir baru siap digunakan.");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function logout() {
     localStorage.removeItem("smkpd_session");
     router.push("/login");
@@ -486,7 +628,7 @@ export default function DashboardPage() {
       <aside className="dashboard-sidebar">
         <Link href="/" className="dash-brand">
           <img src="/logo-smkpd.png" alt="Logo SMKPD" />
-          <div><strong>SMKPD AI</strong><small>Professional v2.2</small></div>
+          <div><strong>SMKPD AI</strong><small>Professional v2.3</small></div>
         </Link>
 
         <div className="dash-user">
@@ -530,7 +672,7 @@ export default function DashboardPage() {
         </section>
 
         <section className="dashboard-stats">
-          <article><span>✨</span><div><strong>{activityCount}</strong><small>Dokumen Dibuat</small></div></article>
+          <article><span>🗂️</span><div><strong>{documents.length}</strong><small>Dokumen Tersimpan</small></div></article>
           <article><span>🧰</span><div><strong>6</strong><small>Generator Aktif</small></div></article>
           <article><span>👤</span><div><strong>{session.role}</strong><small>Hak Akses</small></div></article>
           <article><span>●</span><div><strong>Online</strong><small>Status Gemini AI</small></div></article>
@@ -626,6 +768,7 @@ export default function DashboardPage() {
             <div className="result-toolbar">
               <div><p>HASIL DOKUMEN</p><h2>{result ? activeTool.title : "Belum ada hasil"}</h2></div>
               <div>
+                <button onClick={startNewDocument}>Dokumen Baru</button>
                 <button onClick={copyResult} disabled={!result}>Salin</button>
                 <button onClick={downloadWord} disabled={!result}>Word</button>
                 <button onClick={printPdf} disabled={!result}>PDF</button>
@@ -649,8 +792,83 @@ export default function DashboardPage() {
           </div>
         </section>
 
+        <section className="document-archive">
+          <div className="archive-header">
+            <div>
+              <p>ARSIP LOKAL</p>
+              <h2>Dokumen Tersimpan</h2>
+              <span>
+                Maksimal 100 dokumen tersimpan pada browser dan perangkat yang sedang digunakan.
+              </span>
+            </div>
+            <button onClick={clearArchive} disabled={documents.length === 0}>
+              Kosongkan Arsip
+            </button>
+          </div>
+
+          <div className="archive-controls">
+            <label>
+              Cari Dokumen
+              <input
+                value={documentSearch}
+                onChange={(event) => setDocumentSearch(event.target.value)}
+                placeholder="Cari judul, mapel, atau jenis dokumen..."
+              />
+            </label>
+            <label>
+              Jenis Dokumen
+              <select
+                value={documentFilter}
+                onChange={(event) =>
+                  setDocumentFilter(event.target.value as "all" | ToolId)
+                }
+              >
+                <option value="all">Semua Jenis</option>
+                {tools.map((item) => (
+                  <option key={item.id} value={item.id}>{item.title}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          {filteredDocuments.length > 0 ? (
+            <div className="archive-list">
+              {filteredDocuments.map((document) => (
+                <article
+                  key={document.id}
+                  className={selectedDocumentId === document.id ? "selected" : ""}
+                >
+                  <div className="archive-icon">
+                    {tools.find((item) => item.id === document.tool)?.icon || "📄"}
+                  </div>
+                  <div className="archive-info">
+                    <div className="archive-meta">
+                      <span>{document.toolTitle}</span>
+                      <time>{formatDocumentDate(document.createdAt)}</time>
+                    </div>
+                    <h3>{document.title}</h3>
+                    <p>{document.mapel} • {document.kelas} • Semester {document.semester}</p>
+                  </div>
+                  <div className="archive-actions">
+                    <button onClick={() => openDocument(document)}>Buka</button>
+                    <button className="danger" onClick={() => deleteDocument(document.id)}>
+                      Hapus
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="archive-empty">
+              <span>🗂️</span>
+              <h3>Belum ada dokumen pada arsip ini</h3>
+              <p>Buat dokumen baru atau ubah kata pencarian dan filter.</p>
+            </div>
+          )}
+        </section>
+
         <footer className="dashboard-footer">
-          <span>SMKPD AI Professional v2.2</span>
+          <span>SMKPD AI Professional v2.3</span>
           <span>SMK Pelayaran Demak Boarding School • 2026</span>
         </footer>
       </section>
