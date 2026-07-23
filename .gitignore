@@ -3,3 +3,7 @@ smkpd-ai-web/.env.local
 
 # Backup lokal SMKPD AI
 backup-*/
+
+# Backup lokal AI Router
+_local_backups/
+*.gemini-backup.ts
