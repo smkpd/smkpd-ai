@@ -1,2 +1,5 @@
 
 smkpd-ai-web/.env.local
+
+# Backup lokal SMKPD AI
+backup-*/
